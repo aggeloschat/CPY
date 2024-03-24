@@ -1,7 +1,20 @@
+
+import sys
+
+
+
 #AGGELOS KONSTANTINOS CHATZOPOULOS, 4837
 #PANAGIOTIS PARIS CHATZOPOULOS, 4201
 
 import sys
+
+EOFTOKEN = 1000   # END OF FILE
+ERRORTOKEN = 1001 # ERROR
+CASEID = 1002 # ANAGNORISTIKO
+CASECOMMITTED = 1003 # DESMEUMENI LEKSI
+CASEINT = 1004 # AKERAIA STATHERA
+CASEOPERATOR = 1005 # TELESTIS
+
 
 # ERRORS                      # To check if lex() returned ERROR, lex() <= 100 
 ERROR = -100 
@@ -22,7 +35,7 @@ FOUND_POSSIBLE_COMMITED = -5
 OK = -10
 
 COMMITTED_WORDS = ["KENO","main","def","#def","#int","global","if","elif","else","while","print","return","input","int","and","or","not"]  # To check if lex() returned commited word, lex() >= 100 and lex() < 1000
-SYMBOLS = ["keno","+","-","*","//","%","<",">","==","<=",">=","!=","=",",",":","(",")","#{","#}"]                                          # To check if lex() returned symbol       , lex() >= 1000
+SYMBOLS = ["KENO","+","-","*","//","%","<",">","==","<=",">=","!=","=",",",":","(",")","#{","#}"]                                          # To check if lex() returned symbol       , lex() >= 1000
 
         # 0 1 2 3  4  5  6 7  8 9 10 11 12 13 14 15 16 17              18             19        20
 BOARD = [[0,1,2,OK,11,OK,3,OK,4,5,6, 7, OK,OK,OK,OK,8, ERROR_OPERATOR, ERROR_OPERATOR,ERROR_EOF,ERROR_UNKNOWN], # State 0
@@ -41,15 +54,18 @@ BOARD = [[0,1,2,OK,11,OK,3,OK,4,5,6, 7, OK,OK,OK,OK,8, ERROR_OPERATOR, ERROR_OPE
          ]
 
 file = None
+token_case = None
+token = None
 
 def lex():
+    global token_case
     verbal_unit = ""
     state = 0
     input_char = None
     input_num = None
     i = 0
 
-    while state >= 0:    
+    while state >= 0 and state <= 20:    
 
         input_char = file.read(1)
 
@@ -63,6 +79,7 @@ def lex():
                 i += 1
             if i == 31:
                 state = FOUND_ID
+                token_case = CASEID
                 return verbal_unit
         elif input_char.isdigit():          # Check for number
             input_num = 2
@@ -115,67 +132,102 @@ def lex():
     # HANDLING
     if state < 0 and state > -20:
         if state == FOUND_ID:
+            if verbal_unit in COMMITTED_WORDS:
+                token_case = CASECOMMITTED
+        
+            else:
+                token_case = CASEID
             return verbal_unit
         elif state == FOUND_OPERATOR:
+            token_case = CASEOPERATOR
             return verbal_unit
         elif state == FOUND_NUM:
+            token_case = CASEINT
             return int(verbal_unit)
         elif state == OK:
+            token_case = CASEOPERATOR
             return verbal_unit
         elif state == FOUND_POSSIBLE_COMMITED:
             if verbal_unit in COMMITTED_WORDS:
+                token_case = CASECOMMITTED
                 return verbal_unit
             else:
-                return str(-1*ERROR_BAD_DIESI)
+                token_case = ERRORTOKEN
+                return ERROR_BAD_DIESI
 
     # ERRROR HANDLING
     if state < -99:
+        token_case = ERRORTOKEN
         if state == ERROR_EOF:
-            return str(-1*ERROR_EOF)
+            token_case = EOFTOKEN
+            return ERROR_EOF
         elif state == ERROR_UNKNOWN:
-            return str(-1*ERROR_UNKNOWN)
+            return ERROR_UNKNOWN
         elif state == ERROR_OPERATOR:
-            return str(-1*ERROR_OPERATOR)
+            return ERROR_OPERATOR
         elif state == ERROR_COMMENTS:
-            return str(-1*ERROR_COMMENTS)
+            return ERROR_COMMENTS
         elif state == ERROR_CALL_AGAIN:
             return lex()
+
+#============================================================================================================================================================================================================================
+#============================================================================================================================================================================================================================
+#============================================================================================================================================================================================================================
+
+
+def program():
+    globalspart()
+    functionspart()
+    mainpart()
+
+def globalspart():
     
 
+def functionspart():
 
-#-------------------------MAIN()-----------------------------------------------------------
-file = open("test.cpy","r")
+def mainpart():
 
-while file.read(1) != "":
-    file.seek(file.tell()-1)
-    id = lex()
-    if isinstance(id,str):
-        if id.isdigit():
-            if int(id)*-1 in ERRORS:
-                print(int(id)*-1)
-        else:
-            print(id)
-    elif isinstance(id,int):
-        if id >= -32767 and id <= 32767:
-            print(id)
-        else:
-            print("Number not allowed")
 
-"""file_name = sys.argv[1]
-if (file_name[file_name.find(".")+1:]) != "cpy":
-    print("Wrong source file type")
-    exit()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#====================================================Main()====================================================
+
+"""if len(sys.argv) != 2:
+    print("ERROR")
 else:
-    file = open(file_name,"r")
-    if file.read().isspace():    # In case file is empty
-            print("File is empty")  
+    file_name = sys.argv[1]
+    if file_name == None:
+        print("ERROR")
+        exit()
+    elif (file_name[file_name.find(".")+1:]) != "cpy":
+        print("Wrong source file type")
+        exit()
     else:
-        file.seek(0)
-    
-        while file.read(1) != "":
-            file.seek(file.tell()-1 )
-            print(lex())
-"""
-#------------------------------------------------------------------------------------------
+        file = open(file_name,"r")
+        token = lex()
+        print(token,"::=",token_case)"""
 
-# OPTIONAL/RETURN IN WHICH LINE AND COLLUMN ERROR WAS FOUND
+file = open("test.txt","r")
+
+
+
+#==============================================================================================================
