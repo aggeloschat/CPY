@@ -240,6 +240,9 @@ class Syntax:
             if self.tokenid() == COMMITTED_WORDS[2]:  # "def"
                 self.consume_next_tk()
                 self.functions()
+            if self.tokenid() == COMMITTED_WORDS[4]:
+                print("ERROR FOUND: CAN NOT DECLARE INT AFTER DECLARING FUNCTIONS IN PROGRAM BLOCK")
+                exit()
             # Essential
             if self.tokenid() == COMMITTED_WORDS[3]:  # "#def"
                 self.consume_next_tk()
@@ -318,18 +321,25 @@ class Syntax:
         if self.tokenid() == COMMITTED_WORDS[5]: # global
             self.consume_next_tk()
             self.global_dcl()
+        if self.tokenid() == COMMITTED_WORDS[4]:
+            print("ERROR FOUND: CAN NOT DECLARE INT AFTER GLOBAL IN A FUNCTION")
+            exit()
         if self.tokenid() == "def":
             self.consume_next_tk()
             self.functions()
-        if self.tokenid() != self.tokencase() != EOFTOKEN:
+        if self.tokenid() != "}" and self.tokencase() != EOFTOKEN:
             self.statements()
+        if self.tokenid() != "#}":
+            print("ERROR FOUDN: CAN NOT DECLARE AFTER STATEMENTS IN A FUNCTION BLOCK")
 
     def statements(self):
         self.statement()
-        while self.tokenid() != self.tokencase() != EOFTOKEN:
+        if self.tokenid() == "def" or self.tokenid() == "#int" or self.tokenid() == "global":
+            print("ERROR FOUDN: CAN NOT DECLARE AFTER STATEMENTS IN A FUNCTION BLOCK")
+            exit()
+        while self.tokenid() != "#}" and self.tokencase() != EOFTOKEN:
             self.statements()
-        print("MALAKIES")
-        exit()
+
 
         
 
@@ -449,7 +459,6 @@ else:
         tokenlist() # Creating a list with id "tokens" , for better utilizing the tokens that lex() found
         parse = Syntax(tokens)
         #print(tokens)
-        parse.check_errors()
+        parse.check_errors()                                                                                                                                                                                                                                
         parse.program()
-
 #==============================================================================================================
