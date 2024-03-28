@@ -1,8 +1,3 @@
-
-import sys
-
-
-
 #AGGELOS KONSTANTINOS CHATZOPOULOS, 4837
 #PANAGIOTIS PARIS CHATZOPOULOS, 4201
 
@@ -16,7 +11,7 @@ CASEINT = 1004 # AKERAIA STATHERA
 CASEOPERATOR = 1005 # TELESTIS
 
 
-# ERRORS                      # To check if lex() returned ERROR, lex() <= 100 
+# ERRORS
 ERROR = -100 
 ERROR_UNKNOWN = -101 
 ERROR_OPERATOR = -102 
@@ -24,7 +19,7 @@ ERROR_CALL_AGAIN = -103
 ERROR_BAD_DIESI = -104
 ERROR_COMMENTS = - 105
 ERROR_EOF = -500 
-ERRORS = [ERROR,ERROR_UNKNOWN,ERROR_OPERATOR,ERROR_COMMENTS,ERROR_EOF]
+ERRORS = [ERROR,ERROR_UNKNOWN,ERROR_OPERATOR,ERROR_COMMENTS,ERROR_EOF,ERRORTOKEN,ERROR_BAD_DIESI]
 
 # HANDLE
 FOUND_ID = -1
@@ -35,7 +30,9 @@ FOUND_POSSIBLE_COMMITED = -5
 OK = -10
 
 COMMITTED_WORDS = ["KENO","main","def","#def","#int","global","if","elif","else","while","print","return","input","int","and","or","not"]  # To check if lex() returned commited word, lex() >= 100 and lex() < 1000
-SYMBOLS = ["KENO","+","-","*","//","%","<",">","==","<=",">=","!=","=",",",":","(",")","#{","#}"]                                          # To check if lex() returned symbol       , lex() >= 1000
+SYMBOLS = ["KENO","+","-","*","//","%","<",">","==","<=",">=","!=","=",",",":","(",")","#{","#}"]                                         # To check if lex() returned symbol       , lex() >= 1000
+OPERATORS = ["+","-","*","//","%"]
+STATEMENTS = ["if","print","return","while"]
 
         # 0 1 2 3  4  5  6 7  8 9 10 11 12 13 14 15 16 17              18             19        20
 BOARD = [[0,1,2,OK,11,OK,3,OK,4,5,6, 7, OK,OK,OK,OK,8, ERROR_OPERATOR, ERROR_OPERATOR,ERROR_EOF,ERROR_UNKNOWN], # State 0
@@ -152,82 +149,307 @@ def lex():
                 token_case = CASECOMMITTED
                 return verbal_unit
             else:
-                token_case = ERRORTOKEN
-                return ERROR_BAD_DIESI
+                token_case = ERROR_BAD_DIESI
+                return verbal_unit
 
     # ERRROR HANDLING
     if state < -99:
         token_case = ERRORTOKEN
         if state == ERROR_EOF:
             token_case = EOFTOKEN
-            return ERROR_EOF
+            return verbal_unit
         elif state == ERROR_UNKNOWN:
-            return ERROR_UNKNOWN
+            return verbal_unit
         elif state == ERROR_OPERATOR:
-            return ERROR_OPERATOR
+            return verbal_unit
         elif state == ERROR_COMMENTS:
-            return ERROR_COMMENTS
+            return verbal_unit
         elif state == ERROR_CALL_AGAIN:
             return lex()
 
 #============================================================================================================================================================================================================================
 #============================================================================================================================================================================================================================
+
 #============================================================================================================================================================================================================================
+#------------------------------------------------------SYNTAX--------------------------------------------------------------------------------------------------
+
+tokens = []
 
 
-def program():
-    globalspart()
-    functionspart()
-    mainpart()
+#Function for creating the token list using lex()
+def tokenlist():
+    global tokens
+    global token_case
+    cur_token = lex()
+    while token_case != EOFTOKEN:
+        tokens.append([token_case,cur_token])
+        cur_token = lex()
+    tokens.append([EOFTOKEN,""])
 
-def globalspart():
+
+# Class which implements the Syntax Analyzer
+class Syntax:
+
+    tokens = []
+
+    i = 0
+
+    def __init__(self,tokens):
+        self.tokens = tokens
+
+    # Some basic functions for handling token list
+
+    # Next token
+    def consume_next_tk(self):          
+        self.i += 1
+
+    # Peek the next token's full info
+    def peek_next_tk(self):             
+        return self.tokens[self.i+1]
     
+    # What case is current token
+    def tokencase(self):                
+        return self.tokens[self.i][0]
+    
+    # The current token
+    def tokenid(self):                  
+        return self.tokens[self.i][1]
 
-def functionspart():
+    def check_errors(self):
+        if tokens[0][0] == EOFTOKEN:
+            print("FILE IS EMPTY")
+            exit()
+        for i in tokens:
+            if i[0] in ERRORS:
+                print("LEX FOUND ERROR: ",i[1])
+                exit()
+   
+   
+   # Kanones tis Grammatikis mas
+   
+   # Kanonas tou kyriou Block tou programmatos mas
+    def program(self):
 
-def mainpart():
+        # Essential
+        if self.tokencase() == CASECOMMITTED:
+            # Optional
+            if self.tokenid() == COMMITTED_WORDS[4]:  # "#int"
+                self.consume_next_tk()
+                self.declarations()
+            # Optional
+            if self.tokenid() == COMMITTED_WORDS[2]:  # "def"
+                self.consume_next_tk()
+                self.functions()
+            # Essential
+            if self.tokenid() == COMMITTED_WORDS[3]:  # "#def"
+                self.consume_next_tk()
+                self.main_part()
+            else:
+                print("ERROR FOUND: No Main Function found")
+                exit()
+        
+        else:
+            print("ERROR FOUND: : Found incorrect syntax in Program BLOCK")
+            exit()
+   
+   
+   
+    def main_part(self):
+        if self.tokenid() == COMMITTED_WORDS[1]:
+            self.consume_next_tk()
+            self.func_block()
+            if self.tokencase() == EOFTOKEN:
+                print("Compilation succesful!")
+                exit()
+            else:
+                print("ERROR FOUND: MAIN BLOCK IS NOT IN THE END OF FILE")
+                exit()
+        else:
+            print("Found ERROR")
+            exit()    
+
+    def declarations(self):
+        self.var_list()
+        if self.tokenid() == "#int":
+            self.consume_next_tk()
+            self.declarations()
+
+    def var_list(self):
+        if self.tokencase() == CASEID and self.peek_next_tk()[1] == ",":
+            self.consume_next_tk()
+            self.consume_next_tk()
+            self.var_list()
+        elif self.tokencase() == CASEID:
+            self.consume_next_tk()
+        else:
+            print("FOUND ERROR")
+            exit()
+
+    def functions(self):
+            if self.tokencase() == CASEID:
+                self.consume_next_tk()
+                if self.tokenid() == "(":
+                    self.consume_next_tk()
+                    self.parameters()
+                    if self.tokenid() == ")":
+                        self.consume_next_tk()
+                        if self.tokenid() == ":":
+                            self.consume_next_tk()
+                            if self.tokenid() == "#{":
+                                self.consume_next_tk()
+                                self.func_block()
+                                if self.tokenid() == "#}":
+                                    self.consume_next_tk()
+                                    if self.tokenid() == "def":
+                                        self.consume_next_tk()
+                                        self.functions()
+                                        return
+                                    else:
+                                        return
+                                
+            print("ERROR FOUND: BAD SYNTAX WHILE DECLARING FUNCTION")
+            exit()
+
+
+    def func_block(self):
+        if self.tokenid() == COMMITTED_WORDS[4]: # "#int"
+            self.consume_next_tk()
+            self.declarations()
+        if self.tokenid() == COMMITTED_WORDS[5]: # global
+            self.consume_next_tk()
+            self.global_dcl()
+        if self.tokenid() == "def":
+            self.consume_next_tk()
+            self.functions()
+        if self.tokenid() != self.tokencase() != EOFTOKEN:
+            self.statements()
+
+    def statements(self):
+        self.statement()
+        while self.tokenid() != self.tokencase() != EOFTOKEN:
+            self.statements()
+        print("MALAKIES")
+        exit()
+
+        
+
+    def statement(self):
+        if self.tokencase() == CASEID and self.peek_next_tk()[1]  == "=":
+            self.consume_next_tk()
+            self.consume_next_tk()
+            self.assignment()
+        elif self.tokencase() == CASEID and self.peek_next_tk()[1] ==  "(":
+            self.consume_next_tk()
+            self.consume_next_tk()
+            self.func_call()
+            if self.tokenid() == ")":
+                self.consume_next_tk()
+            else:
+                print("EXPECTED: )")
+                exit()
+        elif self.tokenid() in STATEMENTS:
+            if self.tokenid() == "print":
+                self.consume_next_tk()
+                self.print_statement()
+            elif self.tokenid() == "return":
+                self.consume_next_tk()
+                self.return_statement()
+
+
+    def assignment(self):
+        self.assignment_cases()
+
+    def assignment_cases(self):
+        if self.tokencase() == CASEID or self.tokencase() == CASEINT:
+            self.parameters()
+        elif self.tokenid() == "int":
+            self.consume_next_tk()
+            if self.tokenid() == "(":
+                self.consume_next_tk()
+                if self.tokenid() == "input":
+                    self.consume_next_tk()
+                    if self.consume_next_tk() == "(":
+                        self.consume_next_tk()
+                        if self.tokenid() == ")" and self.peek_next_tk()[1] == ")":
+                            self.consume_next_tk()
+                            self.consume_next_tk()
+                            if self.tokenid() == ")":
+                                self.consume_next_tk()
+                                return
+
+            print("ERROR FOUND: IN ASSIGNMENT SYNTAX")
+            exit()
+
+    def expressions(self):
+        if self.tokencase() == CASEID and self.peek_next_tk()[1] == "(":
+            self.consume_next_tk()
+            self.consume_next_tk()
+            self.func_call()
+            if self.tokenid() == ")":
+                self.consume_next_tk()
+                if self.tokenid() in OPERATORS:
+                    self.consume_next_tk()
+                    self.expressions()
+        elif (self.tokencase() == CASEINT or self.tokencase() == CASEID) and self.peek_next_tk()[1] in OPERATORS:
+            self.consume_next_tk()
+            self.consume_next_tk()
+            self.expressions()
+        elif self.tokencase() == CASEINT or self.tokencase() == CASEID:
+            self.consume_next_tk()
+
+    def parameters(self):
+        self.expressions()
+        if self.tokenid() == ",":
+            self.consume_next_tk()
+            self.parameters()
+
+    def while_statement(self):
+        return
+
+    def if_statement(self):
+        return
+
+
+    def print_statement(self):
+        if self.tokenid() == "(":
+            self.consume_next_tk()
+            self.parameters()
+            if self.tokenid() == ")":
+                self.consume_next_tk()
+                
+    def func_call(self):
+        self.parameters()
+
+    def return_statement(self):
+        self.parameters()
+    
+    def global_dcl(self):
+        self.var_list()
+        if self.tokenid() == "global":
+            self.consume_next_tk()
+            self.global_dcl()
 
 
 
+#====================================================Main()====================================================  
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#====================================================Main()====================================================
-
-"""if len(sys.argv) != 2:
+#Check if input arguments in command line are correct
+if len(sys.argv) != 2:
     print("ERROR")
 else:
     file_name = sys.argv[1]
     if file_name == None:
         print("ERROR")
         exit()
-    elif (file_name[file_name.find(".")+1:]) != "cpy":
+    elif (file_name[-4:]) != ".cpy":
         print("Wrong source file type")
         exit()
     else:
         file = open(file_name,"r")
-        token = lex()
-        print(token,"::=",token_case)"""
-
-file = open("test.txt","r")
-
-
+        tokenlist() # Creating a list with id "tokens" , for better utilizing the tokens that lex() found
+        parse = Syntax(tokens)
+        #print(tokens)
+        parse.check_errors()
+        parse.program()
 
 #==============================================================================================================
