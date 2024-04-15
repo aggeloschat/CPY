@@ -321,22 +321,26 @@ class Syntax:
         if self.tokenid() == COMMITTED_WORDS[5]: # global
             self.consume_next_tk()
             self.global_dcl()
-        if self.tokenid() == COMMITTED_WORDS[4]:
+        if self.tokenid() == COMMITTED_WORDS[4]: # "#int"
             print("ERROR FOUND: CAN NOT DECLARE INT AFTER GLOBAL IN A FUNCTION")
             exit()
         if self.tokenid() == "def":
             self.consume_next_tk()
             self.functions()
-        if self.tokenid() != "}" and self.tokencase() != EOFTOKEN:
+        if self.tokenid() != "#}" and self.tokencase() != EOFTOKEN:
             self.statements()
         if self.tokenid() != "#}":
             print("ERROR FOUDN: CAN NOT DECLARE AFTER STATEMENTS IN A FUNCTION BLOCK")
+            exit()
+        """if self.tokencase() == EOFTOKEN:
+            print("ERROR FOUND: BAD ENDING OF FUNC BLOCK")
+            exit()"""
 
     def statements(self):
-        self.statement()
         if self.tokenid() == "def" or self.tokenid() == "#int" or self.tokenid() == "global":
-            print("ERROR FOUDN: CAN NOT DECLARE AFTER STATEMENTS IN A FUNCTION BLOCK")
+            print("ERROR FOUND: CAN NOT DECLARE AFTER STATEMENTS IN A FUNCTION BLOCK")
             exit()
+        self.statement()
         while self.tokenid() != "#}" and self.tokencase() != EOFTOKEN:
             self.statements()
 

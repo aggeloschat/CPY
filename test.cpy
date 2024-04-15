@@ -2,9 +2,8 @@
 
 def test(x):
     #{
-        #int name
         global calculator
+        print(x)
     #}
-#int testing
 
 #def main
