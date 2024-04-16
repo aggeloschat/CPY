@@ -376,13 +376,15 @@ class Syntax:
             if self.tokenid() == "(":
                 self.consume_next_tk()
                 if self.tokenid() == "input":
-                    self.consume_next_tk()
-                    if self.consume_next_tk() == "(":
+                    self.consume_next_tk()                  
+                    if self.tokenid() == "(":
                         self.consume_next_tk()
                         if self.tokenid() == ")" and self.peek_next_tk()[1] == ")":
                             self.consume_next_tk()
                             self.consume_next_tk()
                             return
+                        else:
+                            print("here")
 
             print("ERROR FOUND: IN ASSIGNMENT SYNTAX")
             exit()

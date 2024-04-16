@@ -3,9 +3,8 @@
 def test(x):
     #{
         global calculator
-        
-        return test(x+2)
         a = int(input())
+        return test(x+2)
     #}
 
 #def main
