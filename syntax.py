@@ -363,6 +363,9 @@ class Syntax:
             elif self.tokenid() == "return":
                 self.consume_next_tk()
                 self.return_statement()
+            elif self.tokenid() == "if":
+                self.consume_next_tk()
+                self.if_statement()
 
 
     def assignment(self):
