@@ -10,4 +10,4 @@ def test(x):
 #def main
 #int i
 
-return x
+return test(x+2)
