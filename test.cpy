@@ -8,6 +8,6 @@ def test(x):
     #}
 
 #def main
-#int i
+#int a
 
 return test(x+2)
