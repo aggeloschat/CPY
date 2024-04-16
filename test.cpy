@@ -9,3 +9,5 @@ def test(x):
 
 #def main
 #int i
+
+return x
