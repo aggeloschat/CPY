@@ -9,5 +9,3 @@ def test(x):
 
 #def main
 #int i
-
-print(a)
