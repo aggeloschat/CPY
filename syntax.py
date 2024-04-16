@@ -124,7 +124,7 @@ def lex():
 
         state = BOARD[state][input_num]
 
-    if (((state < 0) and (state > - 10) or state == ERROR_OPERATOR or state == ERROR_COMMENTS) and (input_char != " ") and (input_char != "") and (input_char !="\n")):
+    if ((((state < 0) and (state > - 10)) or state == ERROR_OPERATOR or state == ERROR_COMMENTS) and (input_char != " ") and (input_char != "") and (input_char !="\n")):
         file.seek(file.tell()-1)
         verbal_unit = verbal_unit[:-1]
 
@@ -133,7 +133,6 @@ def lex():
         if state == FOUND_ID:
             if verbal_unit in COMMITTED_WORDS:
                 token_case = CASECOMMITTED
-        
             else:
                 token_case = CASEID
             return verbal_unit
@@ -381,7 +380,7 @@ class Syntax:
                 self.consume_next_tk()
                 if self.tokenid() == "input":
                     self.consume_next_tk()
-                    if self.consume_next_tk() == "(":
+                    if self.tokenid() == "(":
                         self.consume_next_tk()
                         if self.tokenid() == ")" and self.peek_next_tk()[1] == ")":
                             self.consume_next_tk()
@@ -418,14 +417,39 @@ class Syntax:
         return
 
     def if_statement(self):
-        if (self.tokencase() == CASEID or self.tokencase() == CASEINT) and self.peek_next_tk()[1] in OPERATORS
-        
-        return
+        if self.tokencase() != CASEID and self.tokencase() != CASEINT:
+            print("CALLING ERROR IN IF STATEMENT")
+            exit()
+        self.expressions()
+        if self.tokenid() in CONDITIONS:
+            self.consume_next_tk()
+            self.expressions()
+            if self.tokenid() == ":":
+                self.consume_next_tk()
+                while self.tokenid() != "elif" and self.tokenid() != "else" and self.tokencase() != EOFTOKEN and self.tokenid() != "#}":
+                    self.statement()
+                if self.tokenid() == "elif":
+                    self.consume_next_tk()
+                    self.else_statement()
+                elif self.tokenid() == "else":
+                    self.consume_next_tk()
+                    if self.tokenid() == ":":
+                        self.consume_next_tk()
+                        while self.tokenid() != "elif" and self.tokenid() != "else" and self.tokencase() != EOFTOKEN and self.tokenid() != "#}":
+                            self.statement()
+                        return
+                    print("error")
+                    exit()
+                else:
+                    return
+        print("ERROR IN IF STATEMENT")
+        exit()
 
     def else_statement(self):
         return
     
     def condition(self):
+        return
         
 
     def print_statement(self):
@@ -469,4 +493,5 @@ else:
         #print(tokens)
         parse.check_errors()                                                                                                                                                                                                                                
         parse.program()
+
 #==============================================================================================================
