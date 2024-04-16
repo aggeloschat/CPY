@@ -383,9 +383,6 @@ class Syntax:
                             self.consume_next_tk()
                             self.consume_next_tk()
                             return
-                        else:
-                            print("here")
-
             print("ERROR FOUND: IN ASSIGNMENT SYNTAX")
             exit()
 
