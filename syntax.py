@@ -34,6 +34,7 @@ COMMITTED_WORDS = ["KENO","main","def","#def","#int","global","if","elif","else"
 SYMBOLS = ["KENO","+","-","*","//","%","<",">","==","<=",">=","!=","=",",",":","(",")","#{","#}"]                                         # To check if lex() returned symbol       , lex() >= 1000
 OPERATORS = ["+","-","*","//","%"]
 STATEMENTS = ["if","print","return","while"]
+CONDITIONS = ["<",">","==","<=",">=","!="]
 
         # 0 1 2 3  4  5  6 7  8 9 10 11 12 13 14 15 16 17              18             19        20
 BOARD = [[0,1,2,OK,11,OK,3,OK,4,5,6, 7, OK,OK,OK,OK,8, ERROR_OPERATOR, ERROR_OPERATOR,ERROR_EOF,ERROR_UNKNOWN], # State 0
@@ -379,13 +380,14 @@ class Syntax:
             if self.tokenid() == "(":
                 self.consume_next_tk()
                 if self.tokenid() == "input":
-                    self.consume_next_tk()                  
-                    if self.tokenid() == "(":
+                    self.consume_next_tk()
+                    if self.consume_next_tk() == "(":
                         self.consume_next_tk()
                         if self.tokenid() == ")" and self.peek_next_tk()[1] == ")":
                             self.consume_next_tk()
                             self.consume_next_tk()
                             return
+
             print("ERROR FOUND: IN ASSIGNMENT SYNTAX")
             exit()
 
@@ -416,8 +418,15 @@ class Syntax:
         return
 
     def if_statement(self):
+        if (self.tokencase() == CASEID or self.tokencase() == CASEINT) and self.peek_next_tk()[1] in OPERATORS
+        
         return
 
+    def else_statement(self):
+        return
+    
+    def condition(self):
+        
 
     def print_statement(self):
         if self.tokenid() == "(":
