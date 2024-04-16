@@ -3,7 +3,11 @@
 def test(x):
     #{
         global calculator
-        print(x)
+        
+        return test(x+2)
     #}
 
 #def main
+#int i
+
+print(a)

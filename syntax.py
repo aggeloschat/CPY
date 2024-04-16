@@ -329,12 +329,6 @@ class Syntax:
             self.functions()
         if self.tokenid() != "#}" and self.tokencase() != EOFTOKEN:
             self.statements()
-        if self.tokenid() != "#}":
-            print("ERROR FOUDN: CAN NOT DECLARE AFTER STATEMENTS IN A FUNCTION BLOCK")
-            exit()
-        """if self.tokencase() == EOFTOKEN:
-            print("ERROR FOUND: BAD ENDING OF FUNC BLOCK")
-            exit()"""
 
     def statements(self):
         if self.tokenid() == "def" or self.tokenid() == "#int" or self.tokenid() == "global":
