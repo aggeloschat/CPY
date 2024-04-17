@@ -7,4 +7,5 @@
 
 **ToFixStuff**:
     <p>1. Check if_statement and else_statement more carefuly
-    <br>2. 
+    <br>2. <h>**BIG BUG:**<h> sometimes ":" is not return from lex()
+    <br>3.

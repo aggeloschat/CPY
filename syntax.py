@@ -422,28 +422,25 @@ class Syntax:
         if self.tokencase() != CASEID and self.tokencase() != CASEINT:
             print("CALLING ERROR IN IF STATEMENT")
             exit()
-        self.expressions()
-        if self.tokenid() in CONDITIONS:
+        self.condition()
+        if self.tokenid() == ":":
             self.consume_next_tk()
-            self.expressions()
-            if self.tokenid() == ":":
+            while self.tokenid() != "elif" and self.tokenid() != "else" and self.tokencase() != EOFTOKEN and self.tokenid() != "#}":
+                self.statement()
+            if self.tokenid() == "elif":
+                self.else_statement()
+                return
+            elif self.tokenid() == "else":
                 self.consume_next_tk()
-                while self.tokenid() != "elif" and self.tokenid() != "else" and self.tokencase() != EOFTOKEN and self.tokenid() != "#}":
-                    self.statement()
-                if self.tokenid() == "elif":
-                    self.else_statement()
-                    return
-                elif self.tokenid() == "else":
+                if self.tokenid() == ":":
                     self.consume_next_tk()
-                    if self.tokenid() == ":":
-                        self.consume_next_tk()
-                        while self.tokenid() != "elif" and self.tokenid() != "else" and self.tokencase() != EOFTOKEN and self.tokenid() != "#}":
-                            self.statement()
-                        return
-                    print("error")
-                    exit()
-                else:
+                    while self.tokenid() != "elif" and self.tokenid() != "else" and self.tokencase() != EOFTOKEN and self.tokenid() != "#}":
+                        self.statement()
                     return
+                print("error")
+                exit()
+            else:
+                return
         print("ERROR IN IF STATEMENT")
         exit()
 
@@ -462,21 +459,24 @@ class Syntax:
             if self.tokencase() != CASEID and self.tokencase() != CASEINT:
                 print("CALLING ERROR IN IF STATEMENT")
                 exit()
-            self.expressions()
-            if self.tokenid() in CONDITIONS:
+            self.condition()
+            if self.tokenid() == ":":
                 self.consume_next_tk()
-                self.expressions()
-                if self.tokenid() == ":":
-                    self.consume_next_tk()
-                    while self.tokenid() != "elif" and self.tokenid() != "else" and self.tokencase() != EOFTOKEN and self.tokenid() != "#}":
-                        self.statement()
-                    self.else_statement()
+                while self.tokenid() != "elif" and self.tokenid() != "else" and self.tokencase() != EOFTOKEN and self.tokenid() != "#}":
+                    self.statement()
+                self.else_statement()
         else:
             print("If statements expected \"else\" statement")
             exit()
     
     def condition(self):
-        return
+        self.expressions()
+        if self.tokenid() in CONDITIONS:
+            self.consume_next_tk()
+            self.expressions()
+            return
+        print("syntax error in conditin part of \"if\" statement")
+        exit()
         
 
     def print_statement(self):
