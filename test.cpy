@@ -7,9 +7,13 @@ def test(x):
         if a < b:
                 print(a)
                 return a
-        elif a < b:
+        elif a < b: 
                 print(a)
         else:
                 return a 
         return test(x+2)
     #}
+
+#def main
+#int alpha
+
