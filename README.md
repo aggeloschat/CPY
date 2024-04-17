@@ -5,7 +5,7 @@
 5. Run tests for syntax()
 
 
-<h3>**ToFixStuff**:<h3>
+<h3>**ToFixStuff**:</h3>
     <p>1. Check if_statement and else_statement more carefuly
     <br>2. <h>**BIG BUG:**<h> sometimes ":" is not returned from lex()
     <br>3.
