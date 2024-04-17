@@ -6,5 +6,5 @@
 
 
 ToFixStuff:
-    1. Check if_statement and else_statement more carefuly
+    1. Check if_statement and else_statement more carefuly\n
     2. 
