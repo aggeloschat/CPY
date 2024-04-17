@@ -7,6 +7,6 @@
 
 <h3>ToFixStuff:</h3>
     <p>1. Check if_statement and else_statement more carefuly
-    <br>2. <h5>**BIG BUG:** sometimes ":" is not returned from lex()
+    <br>2. **BIG BUG:** sometimes ":" is not returned from lex()
     <br>3.
     <br>4.
