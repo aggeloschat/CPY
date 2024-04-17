@@ -265,7 +265,7 @@ class Syntax:
             self.consume_next_tk()
             self.func_block()
             if self.tokencase() == EOFTOKEN:
-                print("Compilation succesful!")
+                print("Compilation Successful!")
                 exit()
             else:
                 print("ERROR FOUND: MAIN BLOCK IS NOT IN THE END OF FILE")
@@ -368,6 +368,9 @@ class Syntax:
             elif self.tokenid() == "if":
                 self.consume_next_tk()
                 self.if_statement()
+            elif self.tokenid() == "while":
+                self.consume_next_tk()
+                self.while_statement()
 
 
     def assignment(self):
@@ -416,8 +419,13 @@ class Syntax:
             self.parameters()
 
     def while_statement(self):
-        return
-
+        self.condition()
+        if self.tokenid() == ":":
+            self.consume_next_tk()
+            while self.tokenid() != "elif" and self.tokenid() != "else" and self.tokencase() != EOFTOKEN and self.tokenid() != "#}":
+                self.statement()
+            return
+            
     def if_statement(self):
         if self.tokencase() != CASEID and self.tokencase() != CASEINT:
             print("CALLING ERROR IN IF STATEMENT")

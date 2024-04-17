@@ -3,16 +3,9 @@
 def test(x):
     #{
         global calculator
-        a = int(input())
-        if a < b:
-                print(a)
-                return a
-        elif a < b : 
-                print(a)
-        else :
-                return a 
-        return test(x+2)
-    #}
+        
+        y = sqr(x)*sqr(x)
+     #}
 
 #def main
 #int alpha
