@@ -7,8 +7,6 @@ def test(x):
         if a < b:
                 print(a)
                 return a
-        else:
-                print(x)
         return test(x+2)
     #}
 
