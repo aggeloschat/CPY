@@ -5,6 +5,6 @@
 5. Run tests for syntax()
 
 
-***ToFixStuff****:
+**ToFixStuff**:
     <p>1. Check if_statement and else_statement more carefuly
     <br>2. 
