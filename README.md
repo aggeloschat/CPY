@@ -1,8 +1,9 @@
 1. Make Error Handles accurate and descriptive
-2. Create the functions implementing if and while rules
-3. Create the data tree
-4. ?? Create a table that holds the values ??
+2. ??Create the data tree??
+3. ?? Create a table that holds the values ??
+4. Implement the and...not...or rules
 5. Run tests for syntax()
+
 
 
 **<h3>ToFixStuff:</h3>**

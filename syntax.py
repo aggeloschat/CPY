@@ -31,7 +31,7 @@ FOUND_POSSIBLE_COMMITED = -5
 OK = -10
 
 COMMITTED_WORDS = ["KENO","main","def","#def","#int","global","if","elif","else","while","print","return","input","int","and","or","not"]  # To check if lex() returned commited word, lex() >= 100 and lex() < 1000
-SYMBOLS = ["KENO","+","-","*","//","%","<",">","==","<=",">=","!=","=",",",":","(",")","#{","#}"]                                         # To check if lex() returned symbol       , lex() >= 1000
+SYMBOLS = ["KENO","+","-","*","//","%","<",">","==","<=",">=","!=","=",",",":","(",")","#{","#}"]                                          # To check if lex() returned symbol       , lex() >= 1000
 OPERATORS = ["+","-","*","//","%"]
 STATEMENTS = ["if","print","return","while"]
 CONDITIONS = ["<",">","==","<=",">=","!="]
@@ -125,6 +125,7 @@ def lex():
 
         state = BOARD[state][input_num]
 
+    
     if ((((state < 0) and (state > - 10)) or state == ERROR_OPERATOR or state == ERROR_COMMENTS) and (input_char != " ") and (input_char != "") and (input_char !="\n")):
         file.seek(file.tell()-1)
         verbal_unit = verbal_unit[:-1]
@@ -493,6 +494,9 @@ class Syntax:
             self.parameters()
             if self.tokenid() == ")":
                 self.consume_next_tk()
+        else:
+            print("ERROR FOUND: AFTER PRINT EXPECTED: \"(\"")
+            exit()
                 
     def func_call(self):
         self.parameters()
@@ -509,10 +513,11 @@ class Syntax:
 
 
 #====================================================Main()====================================================  
+#============================================================================================================== 
 
 #Check if input arguments in command line are correct
 if len(sys.argv) != 2:
-    print("ERROR")
+    print("ERROR WHEN CALLING SYNTAX")
 else:
     file_name = sys.argv[1]
     if file_name == None:
@@ -523,10 +528,13 @@ else:
         exit()
     else:
         file = open(file_name,"r")
-        tokenlist() # Creating a list with id "tokens" , for better utilizing the tokens that lex() found
-        parse = Syntax(tokens)
+        #tokenlist()       # Creating a list with id "tokens" , for better utilizing the tokens that lex() found
+        #parse = Syntax(tokens)
         #print(tokens)  
-        parse.check_errors()                                                                                                                                                                                                                                
-        parse.program()
+        #parse.check_errors()                                                                                                                                                                                                                                
+        #parse.program()
+        for i in range(4):
+            print(lex())
         
 #==============================================================================================================
+#============================================================================================================== 
