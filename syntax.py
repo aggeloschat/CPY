@@ -53,12 +53,14 @@ BOARD = [[0,1,2,OK,11,OK,3,OK,4,5,6, 7, OK,OK,OK,OK,8, ERROR_OPERATOR, ERROR_OPE
          ]
 
 file = None
+file_ind = 0
 token_case = None
 token = None
 
 def lex():
     global token_case
     global file
+    global file_ind
     verbal_unit = ""
     state = 0
     input_char = None
@@ -68,10 +70,12 @@ def lex():
     while state >= 0 and state <= 20:    
 
         input_char = file.read(1)
+        file_ind += 1
 
         if input_char == "\n":
             input_num = 0
-        elif input_char.isspace():          # Check for space
+            file_ind += 1
+        elif input_char.isspace():          # Check for space 
             input_num = 0
         elif input_char.isalpha():          # Check for letter
             input_num = 1
@@ -127,7 +131,8 @@ def lex():
 
     
     if ((((state < 0) and (state > - 10)) or state == ERROR_OPERATOR or state == ERROR_COMMENTS) and (input_char != " ") and (input_char != "") and (input_char !="\n")):
-        file.seek(file.tell()-1)
+        file_ind -= 1
+        file.seek(file_ind)
         verbal_unit = verbal_unit[:-1]
 
     # HANDLING
@@ -528,13 +533,12 @@ else:
         exit()
     else:
         file = open(file_name,"r")
-        #tokenlist()       # Creating a list with id "tokens" , for better utilizing the tokens that lex() found
-        #parse = Syntax(tokens)
+        tokenlist()       # Creating a list with id "tokens" , for better utilizing the tokens that lex() found
+        parse = Syntax(tokens)
         #print(tokens)  
-        #parse.check_errors()                                                                                                                                                                                                                                
-        #parse.program()
-        for i in range(4):
-            print(lex())
+        parse.check_errors()                                                                                                                                                                                                                                
+        parse.program()
+        
         
 #==============================================================================================================
 #============================================================================================================== 
