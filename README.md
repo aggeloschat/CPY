@@ -12,4 +12,5 @@
     <br>3.
     <br>4.
     </h5>
-it works
+
+**SOS** FOR WINDOWS ADD (file_ind += 1) in line 76
