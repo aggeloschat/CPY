@@ -74,7 +74,6 @@ def lex():
 
         if input_char == "\n":
             input_num = 0
-            file_ind += 1
         elif input_char.isspace():          # Check for space 
             input_num = 0
         elif input_char.isalpha():          # Check for letter
@@ -534,11 +533,11 @@ else:
     else:
         file = open(file_name,"r")
         tokenlist()       # Creating a list with id "tokens" , for better utilizing the tokens that lex() found
-        parse = Syntax(tokens)
-        #print(tokens)  
-        parse.check_errors()                                                                                                                                                                                                                                
-        parse.program()
-        
+        #parse = Syntax(tokens)
+        print(tokens)  
+        #parse.check_errors()                                                                                                                                                                                                                                
+        #parse.program()
+         
         
 #==============================================================================================================
 #============================================================================================================== 
