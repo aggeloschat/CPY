@@ -3,6 +3,7 @@
 
 
 import sys
+import os
 
 EOFTOKEN = 1000         # END OF FILE
 ERRORTOKEN = 1001       # ERROR
@@ -73,6 +74,8 @@ def lex():
         file_ind += 1
 
         if input_char == "\n":
+            if state == 0:
+                file_ind += 1
             input_num = 0
         elif input_char.isspace():          # Check for space 
             input_num = 0
@@ -516,6 +519,20 @@ class Syntax:
 
 
 
+def handle_all_os(file_name):
+    global file
+
+    file = open(file_name,"r+")
+    content = file.read()
+    file.seek(0)
+    oldcontent = content
+    content = content.replace(os.linesep,'\n')
+    file.write(oldcontent)
+    file.seek(0)
+    tokenlist()     # Creating a list with id "tokens" , for better utilizing the tokens that lex() found
+    file.seek(0)
+    file.write(oldcontent)
+
 #====================================================Main()====================================================  
 #============================================================================================================== 
 
@@ -531,12 +548,13 @@ else:
         print("Wrong source file type")
         exit()
     else:
-        file = open(file_name,"r")
-        tokenlist()       # Creating a list with id "tokens" , for better utilizing the tokens that lex() found
+        handle_all_os(file_name)
+             
         #parse = Syntax(tokens)
         print(tokens)  
         #parse.check_errors()                                                                                                                                                                                                                                
         #parse.program()
+
          
         
 #==============================================================================================================
