@@ -73,10 +73,10 @@ def lex():
         file_ind += 1
 
         if input_char == "\r":
-            file_ind += 1
-        if input_char == "\n":
             if state == 0:
                 file_ind += 1
+            input_num = 0
+        elif input_char == "\n":
             input_num = 0
         elif input_char.isspace():          # Check for space 
             input_num = 0
