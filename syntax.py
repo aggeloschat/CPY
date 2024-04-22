@@ -4,6 +4,7 @@
 
 import sys
 import os
+import platform
 
 EOFTOKEN = 1000         # END OF FILE
 ERRORTOKEN = 1001       # ERROR
@@ -36,6 +37,7 @@ SYMBOLS = ["KENO","+","-","*","//","%","<",">","==","<=",">=","!=","=",",",":","
 OPERATORS = ["+","-","*","//","%"]
 STATEMENTS = ["if","print","return","while"]
 CONDITIONS = ["<",">","==","<=",">=","!="]
+CONDITIONSLOG = ["and","or","not"]
 
         # 0 1 2 3  4  5  6 7  8 9 10 11 12 13 14 15 16 17              18             19        20
 BOARD = [[0,1,2,OK,11,OK,3,OK,4,5,6, 7, OK,OK,OK,OK,8, ERROR_OPERATOR, ERROR_OPERATOR,ERROR_EOF,ERROR_UNKNOWN], # State 0
@@ -488,6 +490,9 @@ class Syntax:
         if self.tokenid() in CONDITIONS:
             self.consume_next_tk()
             self.expressions()
+            if self.tokenid() in CONDITIONSLOG:
+                self.consume_next_tk()
+                self.condition()        
             return
         print("syntax error in conditin part of \"if\" statement")
         exit()
@@ -533,21 +538,11 @@ else:
         exit()
     else:
         file = open(file_name,"r+")
-        old_file = file.read()
-        file.seek(0)
-        new_file = old_file.replace(os.linesep,"\n")
-        file.write(new_file)
-        file.seek(0)
-
-        
-        
-        
         tokenlist()       # Creating a list with id "tokens" , for better utilizing the tokens that lex() found
-        #parse = Syntax(tokens)
-        print(tokens)  
-        #parse.check_errors()                                                                                                                                                                                                                                
-        #parse.program()
-        
+        parse = Syntax(tokens)
+        #print(tokens)  
+        parse.check_errors()                                                                                                                                                                                                                                
+        parse.program()
         
 #==============================================================================================================
 #============================================================================================================== 
