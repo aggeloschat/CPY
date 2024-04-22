@@ -3,6 +3,7 @@
 
 
 import sys
+import os
 
 EOFTOKEN = 1000         # END OF FILE
 ERRORTOKEN = 1001       # ERROR
@@ -72,11 +73,7 @@ def lex():
         input_char = file.read(1)
         file_ind += 1
 
-        if input_char == "\r":
-            if state == 0:
-                file_ind += 1
-            input_num = 0
-        elif input_char == "\n":
+        if input_char == "\n":
             input_num = 0
         elif input_char.isspace():          # Check for space 
             input_num = 0
@@ -133,7 +130,7 @@ def lex():
         state = BOARD[state][input_num]
 
     
-    if ((((state < 0) and (state > - 10)) or state == ERROR_OPERATOR or state == ERROR_COMMENTS) and (input_char != " ") and (input_char != "") and (input_char !="\n")):
+    if ((((state < 0) and (state > - 10)) or state == ERROR_OPERATOR or state == ERROR_COMMENTS) and (input_char != " ") and (input_char != "") and (input_char !="\n") and (input_char != "\r")):
         file_ind -= 1
         file.seek(file_ind)
         verbal_unit = verbal_unit[:-1]
@@ -535,13 +532,22 @@ else:
         print("Wrong source file type")
         exit()
     else:
-        file = open(file_name,"r")
+        file = open(file_name,"r+")
+        old_file = file.read()
+        file.seek(0)
+        new_file = old_file.replace(os.linesep,"\n")
+        file.write(new_file)
+        file.seek(0)
+
+        
+        
+        
         tokenlist()       # Creating a list with id "tokens" , for better utilizing the tokens that lex() found
         #parse = Syntax(tokens)
         print(tokens)  
         #parse.check_errors()                                                                                                                                                                                                                                
         #parse.program()
-         
+        
         
 #==============================================================================================================
 #============================================================================================================== 
