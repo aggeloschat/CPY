@@ -271,7 +271,7 @@ class Syntax:
                 print("Compilation Successful!")
                 exit()
             else:
-                print("ERROR FOUND: MAIN BLOCK IS NOT IN THE END OF FILE")
+                print("ERROR FOUND: Did not find EOF after main function")
                 exit()
         else:
             print("ERROR FOUND: Expected \"main\" after \"#def\"")
@@ -291,7 +291,7 @@ class Syntax:
         elif self.tokencase() == CASEID:
             self.consume_next_tk()
         else:
-            print("FOUND ERROR")
+            print("ERROR in var_list")
             exit()
 
     def functions(self):
@@ -315,6 +315,21 @@ class Syntax:
                                         return
                                     else:
                                         return
+                                else:
+                                    print("ERROR FOUND: Expected \"#}\" in the end of a function block")
+                                    exit()
+                            else:
+                                print("ERROR FOUND: Expected \"#{\" after \")\" in the beggining of a function block")
+                                exit()
+                        else:
+                            print("ERROR FOUND: Expected \":\" after \")\" in the declaring of a function")
+                            exit()
+                    else:
+                        print("ERROR FOUND: Expected \")\" after \"(\" in the declaring of a function")
+                        exit()
+                else:
+                    print("ERROR FOUND: Expected \"(\" after function id")
+                    exit()
             print("ERROR FOUND: BAD SYNTAX WHILE DECLARING FUNCTION")
             exit()
 
@@ -359,7 +374,7 @@ class Syntax:
             if self.tokenid() == ")":
                 self.consume_next_tk()
             else:
-                print("EXPECTED: )")
+                print("ERROR FOUND: Expected \")\" after the parameters in a function call")
                 exit()
         elif self.tokenid() in STATEMENTS:
             if self.tokenid() == "print":
@@ -394,8 +409,20 @@ class Syntax:
                             self.consume_next_tk()
                             self.consume_next_tk()
                             return
-
-            print("ERROR FOUND: IN ASSIGNMENT SYNTAX")
+                        else:
+                            print("ERROR FOUND: Expected double \")\" after parameters in input in assignment statement")
+                            exit()
+                    else:
+                        print("ERROR FOUND: Expected \"(\" after \"input\" in assignment statement")
+                        exit()
+                else:
+                    print("ERROR FOUND: Expected \"input\" after \"(\" in assignment statement")
+                    exit()
+            else:
+                print("ERROR FOUND: Expected \"(\" after \"int\" in assignment statement")
+                exit()
+        else:
+            print("ERROR FOUND: Bad syntax in assignment")
             exit()
 
     def expressions(self):
@@ -546,5 +573,7 @@ else:
         #print(tokens)  
         parse.check_errors()
         parse.program()
+
 #==============================================================================================================
 #============================================================================================================== 
+
