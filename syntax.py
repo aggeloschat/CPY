@@ -249,7 +249,7 @@ class Syntax:
             if self.tokenid() == COMMITTED_WORDS[2]:  # "def"
                 self.consume_next_tk()
                 self.functions()
-            if self.tokenid() == COMMITTED_WORDS[4]:
+            if self.tokenid() == COMMITTED_WORDS[4]:  # "#int"
                 print("ERROR FOUND: CAN NOT DECLARE INT AFTER DECLARING FUNCTIONS IN PROGRAM BLOCK")
                 exit()
             # Essential
@@ -257,10 +257,10 @@ class Syntax:
                 self.consume_next_tk()
                 self.main_part()
             else:
-                print("ERROR FOUND: No Main Function found")
+                print("ERROR FOUND: No Main Function found in the end of program")
                 exit()
         else:
-            print("ERROR FOUND: : Found incorrect syntax in Program BLOCK")
+            print("ERROR FOUND: Bad Syntax in Main Program Block")
             exit()
 
     def main_part(self):
@@ -274,7 +274,7 @@ class Syntax:
                 print("ERROR FOUND: MAIN BLOCK IS NOT IN THE END OF FILE")
                 exit()
         else:
-            print("Found ERROR")
+            print("ERROR FOUND: Expected \"main\" after \"#def\"")
             exit()
 
     def declarations(self):

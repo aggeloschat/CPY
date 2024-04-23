@@ -21,11 +21,11 @@ def fib(x):
     global counterFunctionCalls
     counterFunctionCalls = counterFunctionCalls + 1
     if x<0:
-        return 1 
+        return -1
     elif x==0 or x==1:
-        return -1 - 2
+        return 1
     else:
-        return fib(x-1)+fib(x+2)
+        return fib(x-1)+fib(x-2)
 #}
      
      
@@ -93,7 +93,7 @@ def leap(year):
 
 
         
-#def main
+#def
 #int i
 counterFunctionCalls = 0
 
