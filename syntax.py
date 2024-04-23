@@ -430,9 +430,13 @@ class Syntax:
         self.condition()
         if self.tokenid() == ":":
             self.consume_next_tk()
-            while self.tokenid() != "elif" and self.tokenid() != "else" and self.tokencase() != EOFTOKEN and self.tokenid() != "#}":
-                self.statement()
-            return
+            if self.tokenid() == "#{":
+                self.consume_next_tk()
+                while self.tokenid() != "elif" and self.tokenid() != "else" and self.tokencase() != EOFTOKEN and self.tokenid() != "#}":
+                    self.statement()
+                if self.tokenid() == "#}":
+                    self.consume_next_tk()
+                    return
             
     def if_statement(self):
         if self.tokencase() != CASEID and self.tokencase() != CASEINT:

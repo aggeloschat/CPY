@@ -21,11 +21,11 @@ def fib(x):
     global counterFunctionCalls
     counterFunctionCalls = counterFunctionCalls + 1
     if x<0:
-        return -1
+        return 1 
     elif x==0 or x==1:
         return 1
     else:
-        return fib(x-1)+fib(x-2)
+        return fib(x+1)+fib(x+2)
 #}
      
      
@@ -46,7 +46,6 @@ def isPrime(x):
     #}
 
     ## body of isPrime ##
-    global counterFunctionCalls
     counterFunctionCalls = counterFunctionCalls + 1
     i = 2
     while i < x:
@@ -73,7 +72,6 @@ def quad(x):
     #}
     
     ## body of quad ##
-    global counterFunctionCalls
     counterFunctionCalls = counterFunctionCalls + 1
     y = sqr(x)*sqr(x)
     return y
