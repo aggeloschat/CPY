@@ -15,13 +15,13 @@ CASEOPERATOR = 1005     # TELESTIS
 
 
 # ERRORS
-ERROR = -100 
-ERROR_UNKNOWN = -101 
-ERROR_OPERATOR = -102 
-ERROR_CALL_AGAIN = -103 
+ERROR = -100
+ERROR_UNKNOWN = -101
+ERROR_OPERATOR = -102
+ERROR_CALL_AGAIN = -103
 ERROR_BAD_DIESI = -104
 ERROR_COMMENTS = - 105
-ERROR_EOF = -500 
+ERROR_EOF = -500
 ERRORS = [ERROR,ERROR_UNKNOWN,ERROR_OPERATOR,ERROR_COMMENTS,ERROR_EOF,ERRORTOKEN,ERROR_BAD_DIESI]
 
 # HANDLE
@@ -70,7 +70,7 @@ def lex():
     input_num = None
     i = 0
 
-    while state >= 0 and state <= 20:    
+    while state >= 0 and state <= 20:
 
         input_char = file.read(1)
         file_ind += 1
@@ -131,7 +131,7 @@ def lex():
 
         state = BOARD[state][input_num]
 
-    
+
     if ((((state < 0) and (state > - 10)) or state == ERROR_OPERATOR or state == ERROR_COMMENTS) and (input_char != " ") and (input_char != "") and (input_char !="\n") and (input_char != "\r")):
         file_ind -= 1
         file.seek(file_ind)
@@ -211,19 +211,19 @@ class Syntax:
     # Some basic functions for handling token list
 
     # Next token
-    def consume_next_tk(self):          
+    def consume_next_tk(self):
         self.i += 1
 
     # Peek the next token's full info
-    def peek_next_tk(self):             
+    def peek_next_tk(self):
         return self.tokens[self.i+1]
-    
+
     # What case is current token
-    def tokencase(self):                
+    def tokencase(self):
         return self.tokens[self.i][0]
-    
+
     # The current token
-    def tokenid(self):                  
+    def tokenid(self):
         return self.tokens[self.i][1]
 
     def check_errors(self):
@@ -234,10 +234,8 @@ class Syntax:
             if i[0] in ERRORS:
                 print("LEX FOUND ERROR: ",i[1])
                 exit()
-   
-   
+
    # Kanones tis Grammatikis mas
-   
    # Kanonas tou kyriou Block tou programmatos mas
     def program(self):
 
@@ -261,13 +259,10 @@ class Syntax:
             else:
                 print("ERROR FOUND: No Main Function found")
                 exit()
-        
         else:
             print("ERROR FOUND: : Found incorrect syntax in Program BLOCK")
             exit()
-   
-   
-   
+
     def main_part(self):
         if self.tokenid() == COMMITTED_WORDS[1]:
             self.consume_next_tk()
@@ -280,7 +275,7 @@ class Syntax:
                 exit()
         else:
             print("Found ERROR")
-            exit()    
+            exit()
 
     def declarations(self):
         self.var_list()
@@ -320,7 +315,6 @@ class Syntax:
                                         return
                                     else:
                                         return
-                                
             print("ERROR FOUND: BAD SYNTAX WHILE DECLARING FUNCTION")
             exit()
 
@@ -329,15 +323,18 @@ class Syntax:
         if self.tokenid() == COMMITTED_WORDS[4]: # "#int"
             self.consume_next_tk()
             self.declarations()
-        if self.tokenid() == COMMITTED_WORDS[5]: # global
-            self.consume_next_tk()
-            self.global_dcl()
-        if self.tokenid() == COMMITTED_WORDS[4]: # "#int"
-            print("ERROR FOUND: CAN NOT DECLARE INT AFTER GLOBAL IN A FUNCTION")
-            exit()
         if self.tokenid() == "def":
             self.consume_next_tk()
             self.functions()
+        if self.tokenid() == COMMITTED_WORDS[5]: # global
+            self.consume_next_tk()
+            self.global_dcl()
+        if self.tokenid() == "def":
+            print("Error: CAN NOT DECLARE FUNCTION AFTER GLOBALS IN FUNCTION BLOCK")
+            exit()
+        if self.tokenid() == COMMITTED_WORDS[4]: # "#int"
+            print("ERROR FOUND: CAN NOT DECLARE INT AFTER GLOBAL IN A FUNCTION")
+            exit()
         if self.tokenid() != "#}" and self.tokencase() != EOFTOKEN:
             self.statements()
 
@@ -349,8 +346,6 @@ class Syntax:
         while self.tokenid() != "#}" and self.tokencase() != EOFTOKEN:
             self.statements()
 
-
-        
 
     def statement(self):
         if self.tokencase() == CASEID and self.peek_next_tk()[1]  == "=":
@@ -413,6 +408,11 @@ class Syntax:
                 if self.tokenid() in OPERATORS:
                     self.consume_next_tk()
                     self.expressions()
+                elif self.tokencase() == CASEINT and self.tokenid() < 0:
+                    self.expressions()
+        elif (self.tokencase() == CASEINT or self.tokencase() == CASEID) and self.peek_next_tk()[0] == CASEINT and self.peek_next_tk()[1] < 0:
+            self.consume_next_tk()
+            self.expressions()
         elif (self.tokencase() == CASEINT or self.tokencase() == CASEID) and self.peek_next_tk()[1] in OPERATORS:
             self.consume_next_tk()
             self.consume_next_tk()
@@ -437,7 +437,7 @@ class Syntax:
                 if self.tokenid() == "#}":
                     self.consume_next_tk()
                     return
-            
+
     def if_statement(self):
         if self.tokencase() != CASEID and self.tokencase() != CASEINT:
             print("CALLING ERROR IN IF STATEMENT")
@@ -475,7 +475,7 @@ class Syntax:
             print("ERROR FOUND: In \"if\" statement in \"else\" part")
             exit()
         elif self.tokenid() == "elif":
-            self.consume_next_tk() 
+            self.consume_next_tk()
             if self.tokencase() != CASEID and self.tokencase() != CASEINT:
                 print("CALLING ERROR IN IF STATEMENT")
                 exit()
@@ -488,7 +488,7 @@ class Syntax:
         else:
             print("If statements expected \"else\" statement")
             exit()
-    
+
     def condition(self):
         self.expressions()
         if self.tokenid() in CONDITIONS:
@@ -496,11 +496,10 @@ class Syntax:
             self.expressions()
             if self.tokenid() in CONDITIONSLOG:
                 self.consume_next_tk()
-                self.condition()        
+                self.condition()
             return
         print("syntax error in conditin part of \"if\" statement")
         exit()
-        
 
     def print_statement(self):
         if self.tokenid() == "(":
@@ -511,13 +510,13 @@ class Syntax:
         else:
             print("ERROR FOUND: AFTER PRINT EXPECTED: \"(\"")
             exit()
-                
+
     def func_call(self):
         self.parameters()
 
     def return_statement(self):
         self.parameters()
-    
+
     def global_dcl(self):
         self.var_list()
         if self.tokenid() == "global":
@@ -545,8 +544,7 @@ else:
         tokenlist()       # Creating a list with id "tokens" , for better utilizing the tokens that lex() found
         parse = Syntax(tokens)
         #print(tokens)  
-        parse.check_errors()                                                                                                                                                                                                                                
+        parse.check_errors()
         parse.program()
-        
 #==============================================================================================================
 #============================================================================================================== 

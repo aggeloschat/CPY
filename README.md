@@ -14,3 +14,5 @@
     </h5>
 
 **SOS** FOR WINDOWS ADD (file_ind += 1) in line 76
+
+**GLOBAL GOES AFTER DEF IN A FUNC BLOCK**
