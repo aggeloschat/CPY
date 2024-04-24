@@ -3,8 +3,6 @@
 
 
 import sys
-import os
-import platform
 
 EOFTOKEN = 1000         # END OF FILE
 ERRORTOKEN = 1001       # ERROR
@@ -268,7 +266,7 @@ class Syntax:
             self.consume_next_tk()
             self.func_block()
             if self.tokencase() == EOFTOKEN:
-                print("Compilation Successful!")
+                print("---[Compilation Successful]---")
                 exit()
             else:
                 print("ERROR FOUND: Did not find EOF after main function")
@@ -464,10 +462,13 @@ class Syntax:
                 if self.tokenid() == "#}":
                     self.consume_next_tk()
                     return
+                else:
+                    print("ERROR FOUND: Expected \"#}\" in the end of \"while\" block")
+                    exit()
 
     def if_statement(self):
         if self.tokencase() != CASEID and self.tokencase() != CASEINT:
-            print("CALLING ERROR IN IF STATEMENT")
+            print("ERROR FOUND: Bad syntax in condition in \"if\" statement")
             exit()
         self.condition()
         if self.tokenid() == ":":
@@ -484,8 +485,9 @@ class Syntax:
                     while self.tokenid() != "elif" and self.tokenid() != "else" and self.tokencase() != EOFTOKEN and self.tokenid() != "#}":
                         self.statement()
                     return
-                print("error")
-                exit()
+                else:
+                    print("ERROR FOUND: Expected \" after \"else\" in if statement")
+                    exit()
             else:
                 return
         print("ERROR IN IF STATEMENT")
@@ -499,12 +501,13 @@ class Syntax:
                 while self.tokenid() != "elif" and self.tokenid() != "else" and self.tokencase() != EOFTOKEN and self.tokenid() != "#}":
                     self.statement()
                 return
-            print("ERROR FOUND: In \"if\" statement in \"else\" part")
-            exit()
+            else:
+                print("ERROR FOUND: In \"if\" statement in \"else\" part")
+                exit()
         elif self.tokenid() == "elif":
             self.consume_next_tk()
             if self.tokencase() != CASEID and self.tokencase() != CASEINT:
-                print("CALLING ERROR IN IF STATEMENT")
+                print("ERROR FOUND: Bad syntax in condition in \"elif\" statement")
                 exit()
             self.condition()
             if self.tokenid() == ":":
@@ -512,8 +515,11 @@ class Syntax:
                 while self.tokenid() != "elif" and self.tokenid() != "else" and self.tokencase() != EOFTOKEN and self.tokenid() != "#}":
                     self.statement()
                 self.else_statement()
+            else:
+                print("ERROR FOUND: In \"elif\" statement expected \":\"")
+                exit(0)
         else:
-            print("If statements expected \"else\" statement")
+            print("ERROR FOUND: If statements expected \"else\" statement after \"elif\"")
             exit()
 
     def condition(self):
@@ -525,8 +531,9 @@ class Syntax:
                 self.consume_next_tk()
                 self.condition()
             return
-        print("syntax error in conditin part of \"if\" statement")
-        exit()
+        else:
+            printi("ERROR FOUND: Expected operator in condition in \"if\" and \"elif\"statements")
+            exit()
 
     def print_statement(self):
         if self.tokenid() == "(":
@@ -534,6 +541,9 @@ class Syntax:
             self.parameters()
             if self.tokenid() == ")":
                 self.consume_next_tk()
+            else:
+                print("ERROR FOUND: AFTER PRINT PARAMETERS EXPECTED \")\"")
+                exit()
         else:
             print("ERROR FOUND: AFTER PRINT EXPECTED: \"(\"")
             exit()
@@ -549,8 +559,6 @@ class Syntax:
         if self.tokenid() == "global":
             self.consume_next_tk()
             self.global_dcl()
-
-
 
 #====================================================Main()====================================================  
 #============================================================================================================== 
