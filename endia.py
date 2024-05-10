@@ -37,7 +37,7 @@ def genquad(op,x,y,z):
         quadnum += 1
     else:
         tempquad = firstquad
-        for i in range(1,quadnum-1):
+        while not tempquad.next == None:
             tempquad = tempquad.next
         tempquad.next = quad(op,x,y,z)
         quadnum += 1
@@ -81,11 +81,26 @@ def mergelist(list1,list2):
 def backpatch(list,z):
     
     tempquad = firstquad
-    if tempquad.tag in list:
-        tempquad.z = z
-    for i in range(1,quadnum-1):
-        tempquad = tempquad.next
+    while not tempquad == None:
         if tempquad.tag in list:
-            tempquad.z = z
+            tempquad.z = z 
+        tempquad = tempquad.next
 
+def print_quads():
+    tempquad = firstquad
 
+    while not tempquad == None:
+
+        tempquad.print_quad()
+        tempquad = tempquad.next
+
+genquad("+","a","b","c")
+genquad("<=","xx","tetst","200")
+genquad(":=","sdfads","tdssdf","200")
+l1=makelist(nextquad())
+genquad(">","x","a","_")
+l2=makelist(nextquad())
+genquad("jump","_","_","_")
+l1=mergelist(l1,l2)
+backpatch(l1,nextquad())
+print_quads()
