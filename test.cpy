@@ -1,4 +1,3 @@
-
 #int counterFunctionCalls
 
 def max3(x,y,z):

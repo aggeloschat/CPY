@@ -1,8 +1,8 @@
 #AGGELOS KONSTANTINOS CHATZOPOULOS, 4837
 #PANAGIOTIS PARIS CHATZOPOULOS, 4201
 
-
 import sys
+import endia
 
 EOFTOKEN = 1000         # END OF FILE
 ERRORTOKEN = 1001       # ERROR
@@ -238,6 +238,7 @@ class Syntax:
     def program(self):
 
         # Essential
+        endia.genquad("begin_block","program","_","_")
         if self.tokencase() == CASECOMMITTED:
             # Optional
             if self.tokenid() == COMMITTED_WORDS[4]:  # "#int"
@@ -264,9 +265,17 @@ class Syntax:
     def main_part(self):
         if self.tokenid() == COMMITTED_WORDS[1]:
             self.consume_next_tk()
-            self.func_block()
+            self.func_block("mainfunc")
             if self.tokencase() == EOFTOKEN:
                 print("---[Compilation Successful]---")
+                
+                # Printing the quads generated
+                quad = endia.firstquad
+                while not quad == None:
+                    quad.print_quad()
+                    quad = quad.next
+
+                # Exiting the syntax 
                 exit()
             else:
                 print("ERROR FOUND: Did not find EOF after main function")
@@ -294,6 +303,7 @@ class Syntax:
 
     def functions(self):
             if self.tokencase() == CASEID:
+                funcname = self.tokenid()
                 self.consume_next_tk()
                 if self.tokenid() == "(":
                     self.consume_next_tk()
@@ -304,7 +314,7 @@ class Syntax:
                             self.consume_next_tk()
                             if self.tokenid() == "#{":
                                 self.consume_next_tk()
-                                self.func_block()
+                                self.func_block(funcname)
                                 if self.tokenid() == "#}":
                                     self.consume_next_tk()
                                     if self.tokenid() == "def":
@@ -332,7 +342,8 @@ class Syntax:
             exit()
 
 
-    def func_block(self):
+    def func_block(self,funcname):
+        endia.genquad("begin_block",funcname,"_","_")
         if self.tokenid() == COMMITTED_WORDS[4]: # "#int"
             self.consume_next_tk()
             self.declarations()
@@ -584,4 +595,3 @@ else:
 
 #==============================================================================================================
 #============================================================================================================== 
-

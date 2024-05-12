@@ -20,6 +20,13 @@ class quad:
 
         print(self.tag,": ",self.op,",",self.x,",",self.y,",",self.z,sep='')
 
+class kanonas:
+
+    def __init__(self,ltrue,lfalse):
+
+        self.ltrue = ltrue
+        self.lfalse = lfalse
+
 # Voithikes yporoutines
 
 # H prwth tetrada pou tha dimiourgithei
@@ -94,6 +101,7 @@ def print_quads():
         tempquad.print_quad()
         tempquad = tempquad.next
 
+"""
 genquad("+","a","b","c")
 genquad("<=","xx","tetst","200")
 genquad(":=","sdfads","tdssdf","200")
@@ -104,3 +112,4 @@ genquad("jump","_","_","_")
 l1=mergelist(l1,l2)
 backpatch(l1,nextquad())
 print_quads()
+"""
