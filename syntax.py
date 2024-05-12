@@ -266,10 +266,12 @@ class Syntax:
         if self.tokenid() == COMMITTED_WORDS[1]:
             self.consume_next_tk()
             self.func_block("mainfunc")
+            endia.genquad("halt","_","_","_")
+            endia.genquad("end_block","program","_","_")
             if self.tokencase() == EOFTOKEN:
                 print("---[Compilation Successful]---")
                 
-                # Printing the quads generated
+                # Printing the generated quads
                 quad = endia.firstquad
                 while not quad == None:
                     quad.print_quad()
@@ -373,9 +375,12 @@ class Syntax:
 
     def statement(self):
         if self.tokencase() == CASEID and self.peek_next_tk()[1]  == "=":
+            tempid = self.tokenid()
             self.consume_next_tk()
             self.consume_next_tk()
+            w = endia.newtemp()
             self.assignment()
+            endia.genquad("=",w,"_",tempid)
         elif self.tokencase() == CASEID and self.peek_next_tk()[1] ==  "(":
             self.consume_next_tk()
             self.consume_next_tk()
