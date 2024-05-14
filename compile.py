@@ -2,7 +2,8 @@
 #PANAGIOTIS PARIS CHATZOPOULOS, 4201
 
 import sys
-import endia
+
+file_int = open("endiamesos.int",'w')
 
 EOFTOKEN = 1000         # END OF FILE
 ERRORTOKEN = 1001       # ERROR
@@ -238,11 +239,13 @@ class Syntax:
     def program(self):
 
         # Essential
+        genquad("begin_block","program","_","_")
+        create_scope("program")
         if self.tokencase() == CASECOMMITTED:
             # Optional
             if self.tokenid() == COMMITTED_WORDS[4]:  # "#int"
                 self.consume_next_tk()
-                self.declarations()
+                self.declarations(VARIABLE)
             # Optional
             if self.tokenid() == COMMITTED_WORDS[2]:  # "def"
                 self.consume_next_tk()
@@ -265,6 +268,8 @@ class Syntax:
         if self.tokenid() == COMMITTED_WORDS[1]:
             self.consume_next_tk()
             self.func_block("mainfunc")
+            genquad("halt","_","_","_")
+            genquad("end_block","program","_","_")
             if self.tokencase() == EOFTOKEN:
                 print("---[Compilation Successful]---")
                
@@ -272,6 +277,10 @@ class Syntax:
                 while not quad == None:
                     quad.print_quad()
                     quad = quad.next
+
+                print_table(file_int) 
+                delete_scope()
+                print_table(file_int)
 
                 # Exiting the syntax 
                 exit()
@@ -282,18 +291,22 @@ class Syntax:
             print("ERROR FOUND: Expected \"main\" after \"#def\"")
             exit()
 
-    def declarations(self):
-        self.var_list()
+    def declarations(self,type):
+        self.var_list(type)
         if self.tokenid() == "#int":
             self.consume_next_tk()
-            self.declarations()
+            self.declarations(VARIABLE)
 
-    def var_list(self):
+    def var_list(self,type):
         if self.tokencase() == CASEID and self.peek_next_tk()[1] == ",":
+            if not type == None: 
+                insert_entity(self.tokenid(),VARIABLE,VALUE)
             self.consume_next_tk()
             self.consume_next_tk()
-            self.var_list()
+            self.var_list(type)
         elif self.tokencase() == CASEID:
+            if not type == None:
+                insert_entity(self.tokenid(),VARIABLE,VALUE)
             self.consume_next_tk()
         else:
             print("ERROR in var_list")
@@ -302,18 +315,24 @@ class Syntax:
     def functions(self):
             if self.tokencase() == CASEID:
                 funcname = self.tokenid()
+                insert_entity(funcname,FUNC,0)
+                create_scope(funcname)
                 self.consume_next_tk()
                 if self.tokenid() == "(":
                     self.consume_next_tk()
-                    self.parameters()
+                    self.parameters(None,None)
                     if self.tokenid() == ")":
                         self.consume_next_tk()
                         if self.tokenid() == ":":
                             self.consume_next_tk()
                             if self.tokenid() == "#{":
+                                genquad("begin_block",funcname,"_","_")
                                 self.consume_next_tk()
                                 self.func_block(funcname)
+                                genquad("end_block",funcname,"_","_")
                                 if self.tokenid() == "#}":
+                                    print_table(file_int)
+                                    delete_scope()
                                     self.consume_next_tk()
                                     if self.tokenid() == "def":
                                         self.consume_next_tk()
@@ -343,7 +362,7 @@ class Syntax:
     def func_block(self,funcname):
         if self.tokenid() == COMMITTED_WORDS[4]: # "#int"
             self.consume_next_tk()
-            self.declarations()
+            self.declarations(VARIABLE)
         if self.tokenid() == "def":
             self.consume_next_tk()
             self.functions()
@@ -373,11 +392,14 @@ class Syntax:
             tempid = self.tokenid()
             self.consume_next_tk()
             self.consume_next_tk()
-            self.assignment()
+            variable = [0]
+            self.assignment(variable)
+            genquad("=",variable[0],"_",tempid)
         elif self.tokencase() == CASEID and self.peek_next_tk()[1] ==  "(":
+            funcname = self.tokenid()
             self.consume_next_tk()
             self.consume_next_tk()
-            self.func_call()
+            self.func_call(None,None,funcname)
             if self.tokenid() == ")":
                 self.consume_next_tk()
             else:
@@ -398,12 +420,12 @@ class Syntax:
                 self.while_statement()
 
 
-    def assignment(self):
-        self.assignment_cases()
+    def assignment(self,variable):
+        self.assignment_cases(variable)
 
-    def assignment_cases(self):
+    def assignment_cases(self,variable):
         if self.tokencase() == CASEID or self.tokencase() == CASEINT:
-            self.parameters()
+            self.parameters(variable,0)
         elif self.tokenid() == "int":
             self.consume_next_tk()
             if self.tokenid() == "(":
@@ -432,36 +454,76 @@ class Syntax:
             print("ERROR FOUND: Bad syntax in assignment")
             exit()
 
-    def expressions(self):
+    def expressions(self,variable,i):
+        found_not = 0
+        if self.tokenid() == "not":
+            found_not += 1
+            self.consume_next_tk()
+
         if self.tokencase() == CASEID and self.peek_next_tk()[1] == "(":
+            funcname = self.tokenid()
             self.consume_next_tk()
             self.consume_next_tk()
-            self.func_call()
+            nestedvariable = [0] # For the temp value that will be returned from the function call
+            self.func_call(nestedvariable,0,funcname)
+            variable[i] = nestedvariable[0]
             if self.tokenid() == ")":
                 self.consume_next_tk()
                 if self.tokenid() in OPERATORS:
+                    tempoperator = self.tokenid()
                     self.consume_next_tk()
-                    self.expressions()
+                    variable1 = [0]
+                    w = newtemp()
+                    insert_entity(w,VARIABLE,0)
+                    self.expressions(variable1,0)
+                    genquad(tempoperator,variable[i],variable1[0],w)
+                    if not variable == None:
+                        variable[i] = w
                 elif self.tokencase() == CASEINT and self.tokenid() < 0:
                     self.expressions()
         elif (self.tokencase() == CASEINT or self.tokencase() == CASEID) and self.peek_next_tk()[0] == CASEINT and self.peek_next_tk()[1] < 0:
+            tempnum1 = self.tokenid()
+            tempnum1case = self.tokencase()
             self.consume_next_tk()
-            self.expressions()
+            tempnum2 = self.tokenid()
+            self.consume_next_tk()
+            self.tokens.insert(self.i,[CASEINT,(abs(tempnum2))])
+            self.tokens.insert(self.i,[CASEOPERATOR,"-"])
+            self.tokens.insert(self.i,[tempnum1case,tempnum1])
+            self.expressions(variable,i)
         elif (self.tokencase() == CASEINT or self.tokencase() == CASEID) and self.peek_next_tk()[1] in OPERATORS:
+            tempid = self.tokenid()
             self.consume_next_tk()
+            tempoperator = self.tokenid()
             self.consume_next_tk()
-            self.expressions()
+            w = newtemp()
+            insert_entity(w,VARIABLE,0)
+            variable1 = [0]
+            self.expressions(variable1,0)
+            genquad(tempoperator,tempid,variable1[0],w)
+            if not variable == None: 
+                variable[i] = w
         elif self.tokencase() == CASEINT or self.tokencase() == CASEID:
+            tempid = self.tokenid()
             self.consume_next_tk()
+            if not variable == None:
+                    variable[i] = tempid
 
-    def parameters(self):
-        self.expressions()
+    def parameters(self,variable,i):
+        self.expressions(variable,i)
         if self.tokenid() == ",":
             self.consume_next_tk()
-            self.parameters()
+            if not variable == None:
+                variable.append(0)
+                self.parameters(variable,i+1)
+            else:
+                self.parameters(None,None)
 
     def while_statement(self):
-        self.condition()
+        while_tag= nextquad()
+        variable = [0]
+        c = kanonas(emptylist(),emptylist())
+        self.condition(variable,0,c)
         if self.tokenid() == ":":
             self.consume_next_tk()
             if self.tokenid() == "#{":
@@ -469,23 +531,32 @@ class Syntax:
                 while self.tokenid() != "elif" and self.tokenid() != "else" and self.tokencase() != EOFTOKEN and self.tokenid() != "#}":
                     self.statement()
                 if self.tokenid() == "#}":
+                    backpatch(c.ltrue,nextquad())
+                    backpatch(c.lfalse,nextquad())
+                    genquad("jump","_","_",while_tag)
                     self.consume_next_tk()
                     return
                 else:
                     print("ERROR FOUND: Expected \"#}\" in the end of \"while\" block")
                     exit()
+            else:
+                print("ERROR FOUND: Expected \"#{\" in the start of \"while\" block")
+                exit()
 
     def if_statement(self):
-        if self.tokencase() != CASEID and self.tokencase() != CASEINT:
+        if self.tokencase() != CASEID and self.tokencase() != CASEINT and self.tokenid() != "not":
             print("ERROR FOUND: Bad syntax in condition in \"if\" statement")
             exit()
-        self.condition()
+        variable = [0]
+        c = kanonas(emptylist(),emptylist())
+        self.condition(variable,0,c)
         if self.tokenid() == ":":
             self.consume_next_tk()
             while self.tokenid() != "elif" and self.tokenid() != "else" and self.tokencase() != EOFTOKEN and self.tokenid() != "#}":
                 self.statement()
             if self.tokenid() == "elif":
-                self.else_statement()
+                variable1 = [0]
+                self.else_statement(variable,0,c)
                 return
             elif self.tokenid() == "else":
                 self.consume_next_tk()
@@ -498,11 +569,13 @@ class Syntax:
                     print("ERROR FOUND: Expected \" after \"else\" in if statement")
                     exit()
             else:
+                backpatch(c.ltrue,nextquad())
+                backpatch(c.lfalse,nextquad())
                 return
         print("ERROR IN IF STATEMENT")
         exit()
 
-    def else_statement(self):
+    def else_statement(self,variable,i,c):
         if self.tokenid() == "else":
             self.consume_next_tk()
             if self.tokenid() == ":":
@@ -518,12 +591,12 @@ class Syntax:
             if self.tokencase() != CASEID and self.tokencase() != CASEINT:
                 print("ERROR FOUND: Bad syntax in condition in \"elif\" statement")
                 exit()
-            self.condition()
+            self.condition(variable,i,c)
             if self.tokenid() == ":":
                 self.consume_next_tk()
                 while self.tokenid() != "elif" and self.tokenid() != "else" and self.tokencase() != EOFTOKEN and self.tokenid() != "#}":
                     self.statement()
-                self.else_statement()
+                self.else_statement(variable,i,c)
             else:
                 print("ERROR FOUND: In \"elif\" statement expected \":\"")
                 exit(0)
@@ -531,23 +604,52 @@ class Syntax:
             print("ERROR FOUND: If statements expected \"else\" statement after \"elif\"")
             exit()
 
-    def condition(self):
-        self.expressions()
-        if self.tokenid() in CONDITIONS:
+    def condition(self,variable,i,c):
+        found_not = 0
+        if self.tokenid() == "not":
+            found_not += 1
             self.consume_next_tk()
-            self.expressions()
+        self.expressions(variable,i)
+        if self.tokenid() in CONDITIONS:
+            tempcondition = self.tokenid()
+            self.consume_next_tk()
+            variable1 = [0]
+            j = 0
+            self.expressions(variable1,0)
+            c.ltrue.append(nextquad())
+            genquad(tempcondition,variable[i],variable1[j],"_")
+            c.lfalse.append(nextquad())
+            genquad("jump","_","_","_")
+            if found_not == 1:
+                temp_list = c.lfalse
+                c.lfalse = c.ltrue
+                c.ltrue = temp_list
             if self.tokenid() in CONDITIONSLOG:
-                self.consume_next_tk()
-                self.condition()
+                if self.tokenid() == "or":
+                    self.consume_next_tk()
+                    variable.append(0)
+                    
+                    backpatch(c.lfalse,nextquad())
+                    self.condition(variable,i+1,c)
+                elif self.tokenid() == "and":
+                    self.consume_next_tk()
+                    variable.append(0)
+                    backpatch(c.ltrue,nextquad()) 
+                    self.condition(variable,i+1,c)
+            if found_not == 1:
+                temp_list = c.lfalse
+                c.lfalse = c.ltrue
+                c.ltrue = temp_list
+            backpatch(c.ltrue,nextquad())
             return
         else:
-            printi("ERROR FOUND: Expected operator in condition in \"if\" and \"elif\"statements")
+            print("ERROR FOUND: Expected operator in condition in \"if\" and \"elif\"statements")
             exit()
 
     def print_statement(self):
         if self.tokenid() == "(":
             self.consume_next_tk()
-            self.parameters()
+            self.parameters(None,None)
             if self.tokenid() == ")":
                 self.consume_next_tk()
             else:
@@ -557,14 +659,33 @@ class Syntax:
             print("ERROR FOUND: AFTER PRINT EXPECTED: \"(\"")
             exit()
 
-    def func_call(self):
-        self.parameters()
-
+    def func_call(self,variable,i,funcname):
+            return_needed = 0 
+            if variable == None:
+                variable = [0] 
+                i = 0
+            else:
+                return_needed = 1
+            self.parameters(variable,i)
+            j = i
+            for z in range(len(variable)):
+                if variable[j] != 0:
+                    genquad("par",variable[j],"CV","_")
+                j += 1
+            w = newtemp()
+            insert_entity(w,PARAM,VALUE)
+            if return_needed:
+                genquad("par",w,"RET","_")
+            genquad("call","_","_",funcname)
+            variable[i] = w
+ 
     def return_statement(self):
-        self.parameters()
+        variable = [0,0,0,0,0,0,0,0]
+        self.parameters(variable,0)
+        genquad("retv",variable[0],"_","_")
 
     def global_dcl(self):
-        self.var_list()
+        self.var_list(None)
         if self.tokenid() == "global":
             self.consume_next_tk()
             self.global_dcl()
@@ -593,6 +714,9 @@ class quad:
 
 class kanonas:
 
+    ltrue = []
+    lfalse = []
+    
     def __init__(self,ltrue,lfalse):
 
         self.ltrue = ltrue
@@ -661,7 +785,8 @@ def backpatch(list,z):
     tempquad = firstquad
     while not tempquad == None:
         if tempquad.tag in list:
-            tempquad.z = z 
+            if tempquad.z == "_":
+                tempquad.z = z 
         tempquad = tempquad.next
 
 def print_quads():
@@ -684,6 +809,137 @@ l1=mergelist(l1,l2)
 backpatch(l1,nextquad())
 print_quads()
 """
+
+
+#===================================================TABLE======================================================
+#==============================================================================================================
+
+PARAM = 0
+FUNC = 1
+VARIABLE = 2
+
+VALUE = 100
+
+class entity:
+
+    name = None
+    type = None
+    offset = None
+    parammode = None
+    nestinglevel = None
+    next = None
+    
+
+class scope:
+
+    name = None
+    nestinglevel = None
+    elist = None
+    next = None
+    
+
+SCOPES = None # Head of the stack
+
+def create_scope(name):
+
+    global SCOPES
+    new_scope = scope()
+    new_scope.name = name
+
+    if SCOPES == None:
+        SCOPES = new_scope
+        new_scope.nestinglevel = 0
+        new_scope.next = None
+    else:
+        new_scope.nestinglevel = SCOPES.nestinglevel + 1
+        new_scope.next = SCOPES
+        SCOPES = new_scope
+
+def delete_scope():
+    global SCOPES
+
+    if SCOPES == None:
+        print("There is no scope to delete")
+        exit()
+
+    else:
+        SCOPES = SCOPES.next
+
+
+def insert_entity(name,type,parammode):
+
+    global SCOPES
+
+    new_entity = entity()
+    new_entity.name = name
+    new_entity.type = type
+    new_entity.parammode = parammode
+    new_entity.nestinglevel = SCOPES.nestinglevel
+
+
+    prev = None
+    tmp = SCOPES.elist
+    while not tmp == None:
+        prev = tmp
+        if not tmp.type == FUNC:
+            lastoffset = tmp.offset
+        tmp=tmp.next
+    if prev == None:
+        SCOPES.elist = new_entity
+        new_entity.offset = 12
+    else:
+        prev.next = new_entity
+        new_entity.offset = lastoffset + 4
+
+def search_entity(name):
+    global SCOPES
+    tmp_entity = None
+    tmp_scope = None
+
+    tmp_scope = SCOPES
+    while not tmp_scope == None:
+        tmp_entity = tmp_scope.elist
+        while not tmp_entity == None: 
+            if tmp_entity.name == name:
+                return tmp_entity
+            tmp_entity = tmp_entity.next
+        tmp_scope = tmp_scope.next
+    return None
+
+def print_table(file):
+    global SCOPES
+
+    tmp_entity = None
+    tmp_scope = None
+
+    print("============================================================================",file=file)
+    tmp_scope = SCOPES
+    while not tmp_scope == None:
+        tmp_entity = tmp_scope.elist
+        print("SCOPE:",tmp_scope.name,file=file)
+        while not tmp_entity == None:
+            if tmp_entity.type == VARIABLE:
+                print(tmp_entity.name,tmp_entity.offset,file=file)
+            elif tmp_entity.type == PARAM:
+                print(tmp_entity.name,tmp_entity.offset,"CV",file=file)
+            else:
+                print(tmp_entity.name,file=file)
+            tmp_entity = tmp_entity.next
+        print(file=file)
+        tmp_scope = tmp_scope.next
+
+
+    print("============================================================================",file=file)
+
+
+"""create_scope("main")
+insert_entity("x",VARIABLE,0)
+insert_entity("y",VARIABLE,0)
+insert_entity("myfunction",FUNC,0)
+create_scope("myfunction")
+insert_entity("i",VARIABLE,0)
+insert_entity("j",VARIABLE,0)
+print_table()"""
 
 
 #====================================================Main()====================================================  
