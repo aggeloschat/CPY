@@ -4,6 +4,7 @@
 import sys
 
 file_int = open("endiamesos.int",'w')
+file_sym = open("table.sym",'w')
 
 EOFTOKEN = 1000         # END OF FILE
 ERRORTOKEN = 1001       # ERROR
@@ -275,13 +276,13 @@ class Syntax:
                
                 quad = firstquad
                 while not quad == None:
-                    quad.print_quad()
+                    quad.print_quad(file_int)
                     quad = quad.next
 
-                print_table(file_int) 
+                print_table(file_sym) 
                 delete_scope()
-                print_table(file_int)
-
+                print_table(file_sym)
+                print_table(file_sym)
                 # Exiting the syntax 
                 exit()
             else:
@@ -331,7 +332,7 @@ class Syntax:
                                 self.func_block(funcname)
                                 genquad("end_block",funcname,"_","_")
                                 if self.tokenid() == "#}":
-                                    print_table(file_int)
+                                    print_table(file_sym)
                                     delete_scope()
                                     self.consume_next_tk()
                                     if self.tokenid() == "def":
@@ -709,9 +710,9 @@ class quad:
         self.z = z
         self.tag = quadnum
 
-    def print_quad(self):
+    def print_quad(self,file):
 
-        print(self.tag,": ",self.op,",",self.x,",",self.y,",",self.z,sep='')
+        print(self.tag,": ",self.op,",",self.x,",",self.y,",",self.z,sep='',file=file)
 
 class kanonas:
 

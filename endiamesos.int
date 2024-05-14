@@ -1,125 +1,132 @@
-============================================================================
-SCOPE: max3
-m 12
-
-SCOPE: program
-counterFunctionCalls 12
-max3
-
-============================================================================
-============================================================================
-SCOPE: fib
-T_1 12
-T_2 16
-T_3 20 CV
-T_4 24
-T_5 28
-T_6 32 CV
-
-SCOPE: program
-counterFunctionCalls 12
-max3
-fib
-
-============================================================================
-============================================================================
-SCOPE: divides
-T_7 12
-
-SCOPE: isPrime
-i 12
-divides
-
-SCOPE: program
-counterFunctionCalls 12
-max3
-fib
-isPrime
-
-============================================================================
-============================================================================
-SCOPE: isPrime
-i 12
-divides
-T_8 16
-T_9 20 CV
-T_10 24
-
-SCOPE: program
-counterFunctionCalls 12
-max3
-fib
-isPrime
-
-============================================================================
-============================================================================
-SCOPE: sqr
-T_11 12
-T_12 16
-
-SCOPE: quad
-y 12
-sqr
-
-SCOPE: program
-counterFunctionCalls 12
-max3
-fib
-isPrime
-quad
-
-============================================================================
-============================================================================
-SCOPE: quad
-y 12
-sqr
-T_13 16
-T_14 20 CV
-T_15 24
-T_16 28 CV
-
-SCOPE: program
-counterFunctionCalls 12
-max3
-fib
-isPrime
-quad
-
-============================================================================
-============================================================================
-SCOPE: leap
-T_17 12
-T_18 16
-T_19 20
-T_20 24
-
-SCOPE: program
-counterFunctionCalls 12
-max3
-fib
-isPrime
-quad
-leap
-
-============================================================================
-============================================================================
-SCOPE: program
-counterFunctionCalls 12
-max3
-fib
-isPrime
-quad
-leap
-i 16
-T_21 20 CV
-T_22 24
-T_23 28 CV
-T_24 32 CV
-T_25 36 CV
-T_26 40 CV
-T_27 44 CV
-T_28 48
-
-============================================================================
-============================================================================
-============================================================================
+1: begin_block,program,_,_
+2: begin_block,max3,_,_
+3: =,0,_,counterFunctionCalls
+4: >,x,y,6
+5: jump,_,_,_
+6: >,x,z,8
+7: jump,_,_,_
+8: =,x,_,m
+9: >,y,x,11
+10: jump,_,_,_
+11: >,y,z,13
+12: jump,_,_,_
+13: =,y,_,m
+14: =,z,_,m
+15: retv,m,_,_
+16: end_block,max3,_,_
+17: begin_block,fib,_,_
+18: +,counterFunctionCalls,1,T_1
+19: =,T_1,_,counterFunctionCalls
+20: <,x,0,22
+21: jump,_,_,25
+22: retv,-1,_,_
+23: ==,x,0,27
+24: jump,_,_,25
+25: ==,x,1,27
+26: jump,_,_,_
+27: retv,1,_,_
+28: -,x,1,T_2
+29: par,T_2,CV,_
+30: par,T_3,RET,_
+31: call,_,_,fib
+32: -,x,2,T_5
+33: par,T_5,CV,_
+34: par,T_6,RET,_
+35: call,_,_,fib
+36: +,T_3,T_6,T_4
+37: retv,T_4,_,_
+38: end_block,fib,_,_
+39: begin_block,isPrime,_,_
+40: begin_block,divides,_,_
+41: +,counterFunctionCalls,1,T_7
+42: =,T_7,_,counterFunctionCalls
+43: ==,y,d,45
+44: jump,_,_,_
+45: retv,1,_,_
+46: retv,0,_,_
+47: end_block,divides,_,_
+48: +,counterFunctionCalls,1,T_8
+49: =,T_8,_,counterFunctionCalls
+50: =,2,_,i
+51: <,i,x,53
+52: jump,_,_,62
+53: par,i,CV,_
+54: par,x,CV,_
+55: par,T_9,RET,_
+56: call,_,_,divides
+57: ==,T_9,1,59
+58: jump,_,_,62
+59: retv,0,_,_
+60: +,i,1,T_10
+61: =,T_10,_,i
+62: jump,_,_,51
+63: retv,1,_,_
+64: end_block,isPrime,_,_
+65: begin_block,quad,_,_
+66: begin_block,sqr,_,_
+67: +,counterFunctionCalls,1,T_11
+68: =,T_11,_,counterFunctionCalls
+69: *,x,x,T_12
+70: retv,T_12,_,_
+71: end_block,sqr,_,_
+72: +,counterFunctionCalls,1,T_13
+73: =,T_13,_,counterFunctionCalls
+74: par,x,CV,_
+75: par,T_14,RET,_
+76: call,_,_,sqr
+77: par,x,CV,_
+78: par,T_16,RET,_
+79: call,_,_,sqr
+80: *,T_14,T_16,T_15
+81: =,T_15,_,y
+82: retv,y,_,_
+83: end_block,quad,_,_
+84: begin_block,leap,_,_
+85: +,counterFunctionCalls,1,T_17
+86: =,T_17,_,counterFunctionCalls
+87: %,year,4,T_18
+88: ==,T_18,0,90
+89: jump,_,_,93
+90: %,year,100,T_19
+91: !=,T_19,0,96
+92: jump,_,_,93
+93: %,year,400,T_20
+94: ==,T_20,0,96
+95: jump,_,_,_
+96: retv,1,_,_
+97: retv,0,_,_
+98: end_block,leap,_,_
+99: =,0,_,counterFunctionCalls
+100: =,0,_,i
+101: =,1600,_,i
+102: <=,i,2000,104
+103: jump,_,_,109
+104: par,i,CV,_
+105: par,T_21,RET,_
+106: call,_,_,leap
+107: +,i,400,T_22
+108: =,T_22,_,i
+109: jump,_,_,102
+110: par,2023,CV,_
+111: par,T_23,RET,_
+112: call,_,_,leap
+113: par,2024,CV,_
+114: par,T_24,RET,_
+115: call,_,_,leap
+116: par,3,CV,_
+117: par,T_25,RET,_
+118: call,_,_,quad
+119: par,5,CV,_
+120: par,T_26,RET,_
+121: call,_,_,fib
+122: =,1,_,i
+123: <=,i,12,125
+124: jump,_,_,130
+125: par,i,CV,_
+126: par,T_27,RET,_
+127: call,_,_,isPrime
+128: +,i,1,T_28
+129: =,T_28,_,i
+130: jump,_,_,123
+131: halt,_,_,_
+132: end_block,program,_,_
