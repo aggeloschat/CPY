@@ -466,7 +466,8 @@ class Syntax:
             self.consume_next_tk()
             nestedvariable = [0] # For the temp value that will be returned from the function call
             self.func_call(nestedvariable,0,funcname)
-            variable[i] = nestedvariable[0]
+            if not variable == None:
+                variable[i] = nestedvariable[0]
             if self.tokenid() == ")":
                 self.consume_next_tk()
                 if self.tokenid() in OPERATORS:
