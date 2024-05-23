@@ -240,21 +240,22 @@ class Syntax:
     def program(self):
 
         # Essential
+        # Dimiourgoume tin tetrada gia to block tou programmatos mas
         genquad("begin_block","program","_","_")
         create_scope("program")
         if self.tokencase() == CASECOMMITTED:
-            # Optional
+            # Proeretiko
             if self.tokenid() == COMMITTED_WORDS[4]:  # "#int"
                 self.consume_next_tk()
                 self.declarations(VARIABLE)
-            # Optional
+            # Proeretiko
             if self.tokenid() == COMMITTED_WORDS[2]:  # "def"
                 self.consume_next_tk()
                 self.functions()
             if self.tokenid() == COMMITTED_WORDS[4]:  # "#int"
                 print("ERROR FOUND: CAN NOT DECLARE INT AFTER DECLARING FUNCTIONS IN PROGRAM BLOCK")
                 exit()
-            # Essential
+            # Ypoxreotiko
             if self.tokenid() == COMMITTED_WORDS[3]:  # "#def"
                 self.consume_next_tk()
                 self.main_part()
@@ -265,20 +266,25 @@ class Syntax:
             print("ERROR FOUND: Bad Syntax in Main Program Block")
             exit()
 
+    # O kanonas gia tin main sinartisi tou programmatos mas
     def main_part(self):
         if self.tokenid() == COMMITTED_WORDS[1]:
             self.consume_next_tk()
             self.func_block("mainfunc")
+            # Dimiourgia tis tetradas gia ton termatismo tou programmatos mas
             genquad("halt","_","_","_")
+            # Dimiourgia tis tetradas gia to telos tou block tou programmatos mas
             genquad("end_block","program","_","_")
             if self.tokencase() == EOFTOKEN:
                 print("---[Compilation Successful]---")
                
+                # Write ton tetradon pou dimiourgisame, sto arxeio "endiamesos.int"
                 quad = firstquad
                 while not quad == None:
                     quad.print_quad(file_int)
                     quad = quad.next
-
+                
+                
                 print_table(file_sym) 
                 delete_scope()
                 print_table(file_sym)
@@ -315,6 +321,7 @@ class Syntax:
 
     def functions(self):
             if self.tokencase() == CASEID:
+                # Kratame sto "funcname" to onoma tis sinartisis mas
                 funcname = self.tokenid()
                 insert_entity(funcname,FUNC,0)
                 create_scope(funcname)
@@ -327,9 +334,11 @@ class Syntax:
                         if self.tokenid() == ":":
                             self.consume_next_tk()
                             if self.tokenid() == "#{":
+                                # Dimiourgia tetradas gia tin arxi tou block tis sinartisis "funcname"
                                 genquad("begin_block",funcname,"_","_")
                                 self.consume_next_tk()
                                 self.func_block(funcname)
+                                # Dimiourgia tetradas gia to telos tou block tis sinartisis "funcname"
                                 genquad("end_block",funcname,"_","_")
                                 if self.tokenid() == "#}":
                                     print_table(file_sym)
@@ -371,7 +380,7 @@ class Syntax:
             self.consume_next_tk()
             self.global_dcl()
         if self.tokenid() == "def":
-            print("Error: CAN NOT DECLARE FUNCTION AFTER GLOBALS IN FUNCTION BLOCK")
+            print("ERROR FOUND: CAN NOT DECLARE FUNCTION AFTER GLOBALS IN FUNCTION BLOCK")
             exit()
         if self.tokenid() == COMMITTED_WORDS[4]: # "#int"
             print("ERROR FOUND: CAN NOT DECLARE INT AFTER GLOBAL IN A FUNCTION")
