@@ -2,35 +2,12 @@
 
 def max3(x,y,z):
 #{
-    #int m
-    global counterFunctionCalls
-    counterFunctionCalls = int(input())
-    if x>y and x>z:
+    if x>y:
         m = x
-    elif y>x and y>z:
-        m = y
+    elif x > y:
+      print(a)
     else:
-        m = z
-    return m
+      print(a)
 #}
 
-def firstfunc(x):
-#{
-      if a < b:
-       print(a)
-      return x 
-#}
-
-def secondfunc(x,y,w):
-#{
-      print(iwashere)
-#}
-
-        
 #def main
-#int i
-counterFunctionCalls = 0
-print(Hi)
-
-print(counterFunctionCalls)
-

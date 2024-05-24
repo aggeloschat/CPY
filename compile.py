@@ -583,6 +583,7 @@ class Syntax:
                 backpatch(c.ltrue,nextquad())
                 backpatch(c.lfalse,nextquad())
                 return
+            backpatch(c.lfalse.nextquad())
         print("ERROR IN IF STATEMENT")
         exit()
 
