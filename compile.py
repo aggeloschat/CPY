@@ -617,7 +617,7 @@ class Syntax:
     def condition(self,variable,i,c):
         found_not = 0
         if self.tokenid() == "not":
-            found_not += 1
+            found_not = 1
             self.consume_next_tk()
         self.expressions(variable,i)
         if self.tokenid() in CONDITIONS:
@@ -646,10 +646,7 @@ class Syntax:
                     variable.append(0)
                     backpatch(c.ltrue,nextquad()) 
                     self.condition(variable,i+1,c)
-            if found_not == 1:
-                temp_list = c.lfalse
-                c.lfalse = c.ltrue
-                c.ltrue = temp_list
+            
             backpatch(c.ltrue,nextquad())
             return
         else:
