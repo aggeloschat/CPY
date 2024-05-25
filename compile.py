@@ -424,7 +424,8 @@ class Syntax:
                 self.return_statement()
             elif self.tokenid() == "if":
                 self.consume_next_tk()
-                self.if_statement()
+                if_list = emptylist()
+                self.if_statement(if_list)
             elif self.tokenid() == "while":
                 self.consume_next_tk()
                 self.while_statement()
@@ -554,7 +555,7 @@ class Syntax:
                 print("ERROR FOUND: Expected \"#{\" in the start of \"while\" block")
                 exit()
 
-    def if_statement(self):
+    def if_statement(self,if_list):
         if self.tokencase() != CASEID and self.tokencase() != CASEINT and self.tokenid() != "not":
             print("ERROR FOUND: Bad syntax in condition in \"if\" statement")
             exit()
@@ -563,58 +564,49 @@ class Syntax:
         self.condition(variable,0,c)
         if self.tokenid() == ":":
             self.consume_next_tk()
-            while self.tokenid() != "elif" and self.tokenid() != "else" and self.tokencase() != EOFTOKEN and self.tokenid() != "#}":
-                self.statement()
+            self.statement()
             if self.tokenid() == "elif":
                 variable1 = [0]
-                self.else_statement(variable,0,c)
-                return
-            elif self.tokenid() == "else":
+                self.else_statement(variable,0,c,if_list)
+                if not self.tokenid() == "else":
+                    print(self.peek_next_tk()[1])
+                    print("ERROR FOUND: After \"elif\" statement expected \"else\"")
+                    exit()
+            if self.tokenid() == "else":
+                if_list.append(nextquad())
+                genquad("jump","_","_","_",)
+                backpatch(c.lfalse,nextquad())
                 self.consume_next_tk()
                 if self.tokenid() == ":":
                     self.consume_next_tk()
-                    while self.tokenid() != "elif" and self.tokenid() != "else" and self.tokencase() != EOFTOKEN and self.tokenid() != "#}":
-                        self.statement()
+                    self.statement()
+                    backpatch(if_list,nextquad())
                     return
                 else:
                     print("ERROR FOUND: Expected \" after \"else\" in if statement")
                     exit()
             else:
+                backpatch(if_list,nextquad())
                 backpatch(c.ltrue,nextquad())
                 backpatch(c.lfalse,nextquad())
                 return
-            backpatch(c.lfalse.nextquad())
         print("ERROR IN IF STATEMENT")
         exit()
 
-    def else_statement(self,variable,i,c):
-        if self.tokenid() == "else":
-            self.consume_next_tk()
-            if self.tokenid() == ":":
+    def else_statement(self,variable,i,c,if_list):
+            if self.tokenid() == "elif":
+                if_list.append(nextquad())
+                genquad("jump","_","_","_")
+                backpatch(c.lfalse,nextquad())
                 self.consume_next_tk()
-                while self.tokenid() != "elif" and self.tokenid() != "else" and self.tokencase() != EOFTOKEN and self.tokenid() != "#}":
+                self.condition(variable,i,c)
+                if self.tokenid() == ":":
+                    self.consume_next_tk()
                     self.statement()
-                return
-            else:
-                print("ERROR FOUND: In \"if\" statement in \"else\" part")
-                exit()
-        elif self.tokenid() == "elif":
-            self.consume_next_tk()
-            if self.tokencase() != CASEID and self.tokencase() != CASEINT:
-                print("ERROR FOUND: Bad syntax in condition in \"elif\" statement")
-                exit()
-            self.condition(variable,i,c)
-            if self.tokenid() == ":":
-                self.consume_next_tk()
-                while self.tokenid() != "elif" and self.tokenid() != "else" and self.tokencase() != EOFTOKEN and self.tokenid() != "#}":
-                    self.statement()
-                self.else_statement(variable,i,c)
-            else:
-                print("ERROR FOUND: In \"elif\" statement expected \":\"")
-                exit(0)
-        else:
-            print("ERROR FOUND: If statements expected \"else\" statement after \"elif\"")
-            exit()
+                    self.else_statement(variable,i,c,if_list)
+                else:
+                    print("ERROR FOUND: In \"elif\" statement expected \":\"")
+                    exit(0)
 
     def condition(self,variable,i,c):
         found_not = 0
