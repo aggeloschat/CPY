@@ -402,9 +402,10 @@ class Syntax:
             tempid = self.tokenid()
             self.consume_next_tk()
             self.consume_next_tk()
+            i = 0
             variable = [0]
-            self.assignment(variable)
-            genquad("=",variable[0],"_",tempid)
+            self.assignment(variable,i)
+            genquad("=",variable[i],"_",tempid)
         elif self.tokencase() == CASEID and self.peek_next_tk()[1] ==  "(":
             funcname = self.tokenid()
             self.consume_next_tk()
@@ -424,20 +425,26 @@ class Syntax:
                 self.return_statement()
             elif self.tokenid() == "if":
                 self.consume_next_tk()
-                if_list = emptylist()
-                self.if_statement(if_list)
+                exitlist = emptylist()
+                self.if_statement(exitlist)
             elif self.tokenid() == "while":
                 self.consume_next_tk()
                 self.while_statement()
+        else:
+            print("ERROR FOUND:Bad syntax in statements")
+            exit()
 
 
-    def assignment(self,variable):
-        self.assignment_cases(variable)
+    def assignment(self,variable,i):
+        self.assignment_cases(variable,i)
 
-    def assignment_cases(self,variable):
+    def assignment_cases(self,variable,i):
         if self.tokencase() == CASEID or self.tokencase() == CASEINT:
             self.parameters(variable,0)
         elif self.tokenid() == "int":
+            w = newtemp()
+            variable[i] = w
+            genquad("inp",w,"_","_")
             self.consume_next_tk()
             if self.tokenid() == "(":
                 self.consume_next_tk()
@@ -540,12 +547,12 @@ class Syntax:
             self.consume_next_tk()
             if self.tokenid() == "#{":
                 self.consume_next_tk()
-                while self.tokenid() != "elif" and self.tokenid() != "else" and self.tokencase() != EOFTOKEN and self.tokenid() != "#}":
+                while self.tokenid() != "#}":
                     self.statement()
                 if self.tokenid() == "#}":
                     backpatch(c.ltrue,nextquad())
-                    backpatch(c.lfalse,nextquad())
                     genquad("jump","_","_",while_tag)
+                    backpatch(c.lfalse,nextquad())
                     self.consume_next_tk()
                     return
                 else:
@@ -555,7 +562,7 @@ class Syntax:
                 print("ERROR FOUND: Expected \"#{\" in the start of \"while\" block")
                 exit()
 
-    def if_statement(self,if_list):
+    def if_statement(self,exitlist):
         if self.tokencase() != CASEID and self.tokencase() != CASEINT and self.tokenid() != "not":
             print("ERROR FOUND: Bad syntax in condition in \"if\" statement")
             exit()
@@ -567,35 +574,34 @@ class Syntax:
             self.statement()
             if self.tokenid() == "elif":
                 variable1 = [0]
-                self.else_statement(variable,0,c,if_list)
+                self.else_statement(variable,0,c,exitlist)
                 if not self.tokenid() == "else":
-                    print(self.peek_next_tk()[1])
-                    print("ERROR FOUND: After \"elif\" statement expected \"else\"")
+                    print("ERROR FOUND: After \"elif\" 's block expected \"else\"")
                     exit()
             if self.tokenid() == "else":
-                if_list.append(nextquad())
+                exitlist.append(nextquad())
                 genquad("jump","_","_","_",)
                 backpatch(c.lfalse,nextquad())
                 self.consume_next_tk()
                 if self.tokenid() == ":":
                     self.consume_next_tk()
                     self.statement()
-                    backpatch(if_list,nextquad())
+                    backpatch(exitlist,nextquad())
                     return
                 else:
                     print("ERROR FOUND: Expected \" after \"else\" in if statement")
                     exit()
             else:
-                backpatch(if_list,nextquad())
+                backpatch(exitlist,nextquad())
                 backpatch(c.ltrue,nextquad())
                 backpatch(c.lfalse,nextquad())
                 return
         print("ERROR IN IF STATEMENT")
         exit()
 
-    def else_statement(self,variable,i,c,if_list):
+    def else_statement(self,variable,i,c,exitlist):
             if self.tokenid() == "elif":
-                if_list.append(nextquad())
+                exitlist.append(nextquad())
                 genquad("jump","_","_","_")
                 backpatch(c.lfalse,nextquad())
                 self.consume_next_tk()
@@ -603,7 +609,7 @@ class Syntax:
                 if self.tokenid() == ":":
                     self.consume_next_tk()
                     self.statement()
-                    self.else_statement(variable,i,c,if_list)
+                    self.else_statement(variable,i,c,exitlist)
                 else:
                     print("ERROR FOUND: In \"elif\" statement expected \":\"")
                     exit(0)
@@ -653,9 +659,12 @@ class Syntax:
     def print_statement(self):
         if self.tokenid() == "(":
             self.consume_next_tk()
-            self.parameters(None,None)
+            variable = [0]
+            i = 0
+            self.parameters(variable,i)
             if self.tokenid() == ")":
                 self.consume_next_tk()
+                genquad("out",variable[i],"_","_")
             else:
                 print("ERROR FOUND: AFTER PRINT PARAMETERS EXPECTED \")\"")
                 exit()
@@ -684,7 +693,7 @@ class Syntax:
             variable[i] = w
  
     def return_statement(self):
-        variable = [0,0,0,0,0,0,0,0]
+        variable = [0]
         self.parameters(variable,0)
         genquad("retv",variable[0],"_","_")
 
