@@ -247,6 +247,7 @@ class Syntax:
             # Proeretiko
             if self.tokenid() == COMMITTED_WORDS[4]:  # "#int"
                 self.consume_next_tk()
+                # Lista me ta entities gia to sygkekrimeno scope
                 self.declarations(VARIABLE)
             # Proeretiko
             if self.tokenid() == COMMITTED_WORDS[2]:  # "def"
@@ -284,11 +285,8 @@ class Syntax:
                     quad.print_quad(file_int)
                     quad = quad.next
                 
-                
-                print_table(file_sym) 
+                print_table(file_sym)            
                 delete_scope()
-                print_table(file_sym)
-                print_table(file_sym)
                 # Exiting the syntax 
                 exit()
             else:
@@ -328,7 +326,10 @@ class Syntax:
                 self.consume_next_tk()
                 if self.tokenid() == "(":
                     self.consume_next_tk()
-                    self.parameters(None,None)
+                    variable = [0] 
+                    self.parameters(variable,0)
+                    for i in range(len(variable)):
+                        insert_entity(variable[i],PARAM,0)
                     if self.tokenid() == ")":
                         self.consume_next_tk()
                         if self.tokenid() == ":":
@@ -354,7 +355,7 @@ class Syntax:
                                     print("ERROR FOUND: Expected \"#}\" in the end of a function block")
                                     exit()
                             else:
-                                print("ERROR FOUND: Expected \"#{\" after \")\" in the beggining of a function block")
+                                print("ERROR FOUND: Expected \"#{\" after \":\" in the beggining of a function block")
                                 exit()
                         else:
                             print("ERROR FOUND: Expected \":\" after \")\" in the declaring of a function")
@@ -683,7 +684,7 @@ class Syntax:
                     genquad("par",variable[j],"CV","_")
                 j += 1
             w = newtemp()
-            insert_entity(w,PARAM,VALUE)
+            insert_entity(w,VARIABLE,0)
             if return_needed:
                 genquad("par",w,"RET","_")
             genquad("call","_","_",funcname)
@@ -833,18 +834,18 @@ VALUE = 100
 class entity:
 
     name = None
-    type = None
-    offset = None
-    parammode = None
-    nestinglevel = None
-    next = None
+    type = None             # Parametros,Sinartisi,Metavliti
+    offset = None           # Gia tis metavlites kai parametrous
+    parammode = None        # Gia parametro an einai call by value
+    nestinglevel = None     # Vathos foliasmatos gia tis metavlites (local/global)
+    next = None             # Gia tin lista
     
 
 class scope:
 
     name = None
-    nestinglevel = None
-    elist = None
+    nestinglevel = None     # vathos foliasmatos
+    elist = None            # Lista me ta entities gia to sygkekrimeno scope
     next = None
     
 
@@ -916,13 +917,18 @@ def search_entity(name):
         tmp_scope = tmp_scope.next
     return None
 
+print_num = 1
+
 def print_table(file):
     global SCOPES
-
+    global print_num
+    
     tmp_entity = None
     tmp_scope = None
-
-    print("============================================================================",file=file)
+    
+    print("[ PRINT",print_num,"]",file=file)
+    print_num += 1
+    print("============================================================================\n",file=file)
     tmp_scope = SCOPES
     while not tmp_scope == None:
         tmp_entity = tmp_scope.elist
@@ -939,7 +945,6 @@ def print_table(file):
         tmp_scope = tmp_scope.next
 
 
-    print("============================================================================",file=file)
 
 
 """create_scope("main")

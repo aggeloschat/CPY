@@ -1,9 +1,16 @@
 #int counterFunctionCalls
-def max3(x,y,z):
+def max3(x):
 #{
-      if not a < b and not g < z: 
+      def maxnested(x,second):
+      #{
+           #int temporary
+           print(hi)
+           max3(givenvar,x)
+      #}
+      if not a < b and g < z: 
        print(aggelos)
       else:
        print(hi)
 #}
 #def main
+
