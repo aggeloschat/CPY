@@ -2,34 +2,34 @@
 ============================================================================
 
 SCOPE: maxnested
-x 12 CV
-second 16 CV
-temporary 20
-T_1 24
+x / 12 / CV
+second / 16 / CV
+temporary / 20
+T_1 / 24
 
 SCOPE: max3
-x 12 CV
-maxnested
+x / 12 / CV
+maxnested / None / 4
 
 SCOPE: program
-counterFunctionCalls 12
-max3
+counterFunctionCalls / 12
+max3 / None / 3
 
 [ PRINT 2 ]
 ============================================================================
 
 SCOPE: max3
-x 12 CV
-maxnested
+x / 12 / CV
+maxnested / None / 4
 
 SCOPE: program
-counterFunctionCalls 12
-max3
+counterFunctionCalls / 12
+max3 / None / 3
 
 [ PRINT 3 ]
 ============================================================================
 
 SCOPE: program
-counterFunctionCalls 12
-max3
+counterFunctionCalls / 12
+max3 / None / 3
 

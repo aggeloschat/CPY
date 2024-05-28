@@ -337,6 +337,7 @@ class Syntax:
                             if self.tokenid() == "#{":
                                 # Dimiourgia tetradas gia tin arxi tou block tis sinartisis "funcname"
                                 genquad("begin_block",funcname,"_","_")
+                                search_entity(funcname).startQuad = nextquad()
                                 self.consume_next_tk()
                                 self.func_block(funcname)
                                 # Dimiourgia tetradas gia to telos tou block tis sinartisis "funcname"
@@ -444,6 +445,7 @@ class Syntax:
             self.parameters(variable,0)
         elif self.tokenid() == "int":
             w = newtemp()
+            insert_entity(VARIABLE,0)
             variable[i] = w
             genquad("inp",w,"_","_")
             self.consume_next_tk()
@@ -838,6 +840,11 @@ class entity:
     offset = None           # Gia tis metavlites kai parametrous
     parammode = None        # Gia parametro an einai call by value
     nestinglevel = None     # Vathos foliasmatos gia tis metavlites (local/global)
+    
+    startQuad = None       # Gia tis sinartisis
+    argument = None        # Lista parametron 
+    framelength = None     # Mikos egrafimatos drastiriopiisis
+    
     next = None             # Gia tin lista
     
 
@@ -935,9 +942,11 @@ def print_table(file):
         print("SCOPE:",tmp_scope.name,file=file)
         while not tmp_entity == None:
             if tmp_entity.type == VARIABLE:
-                print(tmp_entity.name,tmp_entity.offset,file=file)
+                print(tmp_entity.name,"/",tmp_entity.offset,file=file)
             elif tmp_entity.type == PARAM:
-                print(tmp_entity.name,tmp_entity.offset,"CV",file=file)
+                print(tmp_entity.name,"/",tmp_entity.offset,"/","CV",file=file)
+            elif tmp_entity.type == FUNC:
+                print(tmp_entity.name,"/",tmp_entity.framelength,"/",tmp_entity.startQuad,file=file)
             else:
                 print(tmp_entity.name,file=file)
             tmp_entity = tmp_entity.next
