@@ -450,7 +450,7 @@ class Syntax:
             self.parameters(variable,0)
         elif self.tokenid() == "int":
             w = newtemp()
-            insert_entity(VARIABLE,0)
+            insert_entity(w,VARIABLE,0)
             variable[i] = w
             genquad("inp",w,"_","_")
             self.consume_next_tk()

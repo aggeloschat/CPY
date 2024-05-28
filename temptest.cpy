@@ -5,6 +5,7 @@ def f(a):
       def nestedfunc(x):
       #{
        #int x,y
+       a = int(input())
        return x
       #}
       c = a + 1

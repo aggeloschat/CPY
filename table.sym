@@ -5,11 +5,12 @@ SCOPE: nestedfunc
 x / 12 / CV
 x / 16
 y / 20
+T_1 / 24
 
 SCOPE: f
 a / 12 / CV
 c / 16
-nestedfunc / 4 / 24
+nestedfunc / 4 / 28
 
 SCOPE: program
 a / 12
@@ -22,8 +23,8 @@ f / 3 / 20
 SCOPE: f
 a / 12 / CV
 c / 16
-nestedfunc / 4 / 24
-T_1 / 20
+nestedfunc / 4 / 28
+T_2 / 20
 
 SCOPE: program
 a / 12
@@ -37,5 +38,5 @@ SCOPE: program
 a / 12
 b / 16
 f / 3 / 24
-T_2 / 20
+T_3 / 20
 
