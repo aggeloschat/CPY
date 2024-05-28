@@ -343,8 +343,13 @@ class Syntax:
                                 # Dimiourgia tetradas gia to telos tou block tis sinartisis "funcname"
                                 genquad("end_block",funcname,"_","_")
                                 if self.tokenid() == "#}":
+
+                                    # Ypologizo framelength tis sinartis funcname
+                                    
                                     print_table(file_sym)
+
                                     delete_scope()
+
                                     self.consume_next_tk()
                                     if self.tokenid() == "def":
                                         self.consume_next_tk()
@@ -830,7 +835,6 @@ print_quads()
 PARAM = 0
 FUNC = 1
 VARIABLE = 2
-
 VALUE = 100
 
 class entity:
@@ -843,7 +847,7 @@ class entity:
     
     startQuad = None       # Gia tis sinartisis
     argument = None        # Lista parametron 
-    framelength = None     # Mikos egrafimatos drastiriopiisis
+    framelength = 12     # Mikos egrafimatos drastiriopiisis
     
     next = None             # Gia tin lista
     
@@ -909,6 +913,13 @@ def insert_entity(name,type,parammode):
         prev.next = new_entity
         new_entity.offset = lastoffset + 4
 
+    # An prostheso kialla entities pou den einai functinos sto scope auksanete to framelength
+    if not new_entity.type == FUNC:
+        if not SCOPES.name == "program":
+            if search_entity(SCOPES.name).type == FUNC:
+                search_entity(SCOPES.name).framelength += 4        
+
+
 def search_entity(name):
     global SCOPES
     tmp_entity = None
@@ -946,7 +957,7 @@ def print_table(file):
             elif tmp_entity.type == PARAM:
                 print(tmp_entity.name,"/",tmp_entity.offset,"/","CV",file=file)
             elif tmp_entity.type == FUNC:
-                print(tmp_entity.name,"/",tmp_entity.framelength,"/",tmp_entity.startQuad,file=file)
+                print(tmp_entity.name,"/",tmp_entity.startQuad,"/",tmp_entity.framelength,file=file)
             else:
                 print(tmp_entity.name,file=file)
             tmp_entity = tmp_entity.next

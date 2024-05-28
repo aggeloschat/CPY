@@ -1,35 +1,41 @@
 [ PRINT 1 ]
 ============================================================================
 
-SCOPE: maxnested
+SCOPE: nestedfunc
 x / 12 / CV
-second / 16 / CV
-temporary / 20
-T_1 / 24
+x / 16
+y / 20
 
-SCOPE: max3
-x / 12 / CV
-maxnested / None / 4
+SCOPE: f
+a / 12 / CV
+c / 16
+nestedfunc / 4 / 24
 
 SCOPE: program
-counterFunctionCalls / 12
-max3 / None / 3
+a / 12
+b / 16
+f / 3 / 20
 
 [ PRINT 2 ]
 ============================================================================
 
-SCOPE: max3
-x / 12 / CV
-maxnested / None / 4
+SCOPE: f
+a / 12 / CV
+c / 16
+nestedfunc / 4 / 24
+T_1 / 20
 
 SCOPE: program
-counterFunctionCalls / 12
-max3 / None / 3
+a / 12
+b / 16
+f / 3 / 24
 
 [ PRINT 3 ]
 ============================================================================
 
 SCOPE: program
-counterFunctionCalls / 12
-max3 / None / 3
+a / 12
+b / 16
+f / 3 / 24
+T_2 / 20
 
