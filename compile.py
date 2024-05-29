@@ -238,10 +238,9 @@ class Syntax:
    # Kanones tis Grammatikis mas
    # Kanonas tou kyriou Block tou programmatos mas
     def program(self):
-
+        
         # Essential
         # Dimiourgoume tin tetrada gia to block tou programmatos mas
-        genquad("begin_block","program","_","_")
         create_scope("program")
         if self.tokencase() == CASECOMMITTED:
             # Proeretiko
@@ -258,6 +257,7 @@ class Syntax:
                 exit()
             # Ypoxreotiko
             if self.tokenid() == COMMITTED_WORDS[3]:  # "#def"
+                genquad("begin_block","main","_","_")
                 self.consume_next_tk()
                 self.main_part()
             else:
@@ -272,6 +272,8 @@ class Syntax:
         if self.tokenid() == COMMITTED_WORDS[1]:
             self.consume_next_tk()
             self.func_block("mainfunc")
+            genquad("end_block","main","_","_")
+            genquad("begin_block","program","_","_")
             # Dimiourgia tis tetradas gia ton termatismo tou programmatos mas
             genquad("halt","_","_","_")
             # Dimiourgia tis tetradas gia to telos tou block tou programmatos mas
@@ -827,8 +829,6 @@ l1=mergelist(l1,l2)
 backpatch(l1,nextquad())
 print_quads()
 """
-
-
 #===================================================TABLE======================================================
 #==============================================================================================================
 
@@ -976,9 +976,150 @@ insert_entity("i",VARIABLE,0)
 insert_entity("j",VARIABLE,0)
 print_table()"""
 
+#====================================================final()====================================================  
+#============================================================================================================== 
+
+output_final = open("telikos.asm","w")
+
+def gnlvcode():
+    return
+
+def loadvr(v,r):
+        
+    ent = search_entity(v)
+   
+    # An v einai stathera
+    if str(v).isdigit():
+        print("li "+str(r)+","+str(v),file=output_final)
+    # An v einai global variable
+    elif ent.nestinglevel == 0:
+        print("lw "+str(r)+", -"+str(ent.offset)+"(gp)",file=output_final)
+    # An v einai local variable
+    elif ent.nestinglev==SCOPES.nestinglevel and (ent.type == PARAM or ent.type == VARIABLE):
+        print("lw "+str(r)+", -"+str(ent.offset)+"(sp)",file=output_final)
+    # An v einai local variable / parameteros se kapoion progono
+    elif (ent.type == PARAM or ent.type == VARIABLE):
+        gnlvcode()
+        print("lw "+str(r)+", (t0)",file=output_final)
+
+def storevr(r,v):
+
+    ent = search_entity(v)
+    
+    ent = search_entity(v)
+
+    # An  v global variable
+    if ent.nestinglevel == 0:
+        print("sw "+str(r)+", -"+str(ent.offset)+"(gp)",file=output_final) 
+    # An v einai local variable / parametros
+    elif (ent.type == VARIABLE or ent.type == PARAM) and ent.nestinglevel == SCOPES.nestinglevel:
+        print("sw "+str(r)+", -"+str(ent.offset)+"(sp)",file=output_final)
+    # An v einai local variable / parametros se kapoion progono
+    elif ent.type == VARIABLE or ent.type == PARAM:
+        gnlvcode(v)
+        print("sw "+str(r)+" ,(t0)",file=output_final)
+
+def jump(label):
+    print("b "+str(label),file=output_final)
+
+def relop(cond,x,y,z):
+    loadvr(x,t1)
+    loadvr(y,t2)
+    branch(cond,z)
+
+def branch(cond,z):
+
+    if cond == "==":
+        print("beq t1, t2, "+str(z),file=output_final)
+    elif cond == "<":
+        print("blt t1, t2, "+str(z),file=output_final)
+    elif cond == ">":
+        print("bgt, t2, "+str(z),file=output_final)
+    elif cond == "<=":
+        print("ble t1, t2, "+str(z),file=output_final)
+    elif cond == ">=":
+        print("bge t1, t2, "+str(z),file=output_final)
+    elif cond == "!=":
+        print("bne t1, t2, "+str(z),file=output_final)
+
+def assign(x,z):
+    loadvr(x,t1)
+    storerv(t1,int(z))
+
+def numerical(oper,x,y,z):
+    loadvr(x,t1)
+    loadvr(y,t2)
+
+    if oper == "+":
+        print("add t1, t1, t2",file=output_final)
+    elif oper == "-":
+        print("sub t1, t1, t2",file=output_final)
+    elif oper == "*":
+        print("mul t1, t1, t2",file=output_final)
+    elif oper == "/":
+        print("div t1, t1, t2",file=output_final)
+    elif oper == "%":
+        print("rem t1, t1, t2",file=output_final)
+
+    storerv(t1,int(z))
+
+def retv(x):
+    loadvr(x,t1)
+    print("lw t0, -8(sp)",file=output_final)
+    print("sw t1, (t0)",file=output_final)
+
+def call_func_par(argument_list):
+
+    print("addi fp, sp, "+str(SCOPES.framelength),file=output_final)
+
+
+    for i in range(len(argument_list)):
+        loadvr(x,t0)
+        print("sw t0, -(12+"+str(4*i)+")(fp)",file=output_final)
+
+def call_func_retv(ent):
+
+    print("addi t0, sp, -"+str(ent.offset),file=output_final)
+    print("sw t0, -8(fp)",file=output_final)
+
+def call_func(f1,f2):
+
+    # Kalousa f1 kai klithisa f2 einai sto idio vathos foliasmatos
+    if search_entity(f1).nestinglevel == search_entity(f).nestinglevel:
+        print("lw t0, -4(sp)",file=output_final)
+        print("sw t0, -4(fp)",file=output_final)
+    # An exoun diaforetiko vathos foliasmatos h f1 einai goneas ths f2 
+    else:
+        print("sw sp, -4(fp)",file= output_final)
+
+    print("addi sp, sp, "+str(search_entity(f1).framelength),file=output_final)
+
+    print("jal",f2,file=output_final)
+    print("addi sp, sp, -"+str(search_entity(f1).framelength),file=output_final)
+
+
+def ready_func(f):
+
+    print("sw ra, (sp)",file=output_final)
+
+def finish_func(f):
+
+    print("lw ram, (sp)",file=output_final)
+    print("jr ra",file=output_final)
+
+def ready_program():
+    
+    ent = search_entity("main")
+
+    print("j Lmain",file=output_final)
+
+    print("addi sp, sp, ",+str(ent.framelength),file=output_final)
+
+    print("move gp, sp",file=output_final)
 
 #====================================================Main()====================================================  
 #============================================================================================================== 
+
 
 #Check if input arguments in command line are correct
 if len(sys.argv) != 2:

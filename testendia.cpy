@@ -13,4 +13,6 @@ def max3(x):
        print(hi)
 #}
 #def main
+tempvar = counterFunctionCalls
+tempvar2 = 1
 
