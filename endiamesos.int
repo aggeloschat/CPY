@@ -13,10 +13,10 @@
 13: jump,_,_,15
 14: out,hi,_,_
 15: end_block,max3,_,_
-16: begin_block,main,_,_
-17: =,counterFunctionCalls,_,tempvar
-18: =,1,_,tempvar2
-19: end_block,main,_,_
-20: begin_block,program,_,_
+16: begin_block,program,_,_
+17: begin_block,main,_,_
+18: =,counterFunctionCalls,_,tempvar
+19: =,1,_,tempvar2
+20: end_block,main,_,_
 21: halt,_,_,_
 22: end_block,program,_,_

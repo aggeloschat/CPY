@@ -257,6 +257,7 @@ class Syntax:
                 exit()
             # Ypoxreotiko
             if self.tokenid() == COMMITTED_WORDS[3]:  # "#def"
+                genquad("begin_block","program","_","_")
                 genquad("begin_block","main","_","_")
                 self.consume_next_tk()
                 self.main_part()
@@ -273,7 +274,6 @@ class Syntax:
             self.consume_next_tk()
             self.func_block("mainfunc")
             genquad("end_block","main","_","_")
-            genquad("begin_block","program","_","_")
             # Dimiourgia tis tetradas gia ton termatismo tou programmatos mas
             genquad("halt","_","_","_")
             # Dimiourgia tis tetradas gia to telos tou block tou programmatos mas
